@@ -1,1 +1,3 @@
 # go-game
+
+school project
