@@ -13,8 +13,13 @@ public class Connection {
 	private ObjectOutputStream output;
 	private ObjectInputStream input;
 	
-	public Connection(Socket socket) throws IOException {
+	private int id; 
+	private List<Player> players;
+
+	public Connection(int id, Socket socket, List<Player> players) throws IOException {
+		this.id = id;
 		this.socket = socket;
+		this.players = players;
 		input = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 		output = new ObjectOutputStream(socket.getOutputStream());
 			
@@ -38,6 +43,14 @@ public class Connection {
 		output.flush();
 	}
 	
+	public synchronized void sendToAll(String msg) throws IOException {
+		for(Player player : players) {
+			if(!player.equals(null)) {
+				player.getConnection().send(msg);
+			}
+		}
+	}
+	
 	public void close() throws IOException {
 		input.close();
 		output.close();
@@ -46,8 +59,8 @@ public class Connection {
 	
 	public boolean isClosed() {
 		if (socket.isOutputShutdown() && socket.isInputShutdown() && socket.isClosed())
-			return false;
-		else 
 			return true;
+		else 
+			return false;
 	}
 }
