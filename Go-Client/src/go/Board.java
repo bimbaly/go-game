@@ -109,4 +109,77 @@ public class Board {
 		return false;
 	}
 	
+	private boolean searchLibertyOpponent(int index, int occupiedIndex) {
+		if ((stones.get(index - size) == null && index - size != occupiedIndex) || 
+			(stones.get(index + size) == null && index + size != occupiedIndex) || 
+			(stones.get(index - 1) == null && index - 1 != occupiedIndex) || 
+			(stones.get(index + 1) == null && index + 1 != occupiedIndex)) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean checkIfLegal(int row, int col, StoneColor color) {
+		
+		PlayerColor = color;
+		int index = row + 1 + col * size;
+		
+		if (stones.get(index) != null) {
+			System.out.println("illegal - OCCUPIED");
+			return false;
+		}
+		
+		
+		if (searchLiberty(index)) {
+			System.out.println("legal - at least one liberty");
+			return true;
+		}
+		up: if (stones.get(index - size).getColor() != color) {
+			int opponentGroup = stones.get(index - size).getGroup();
+			for (Stone s : groups.get(opponentGroup)) {
+				if (searchLibertyOpponent(s.getIndex(), index)) {
+					break up;
+				}
+			}
+			System.out.println("legal - killing group above");
+			return true;
+		}
+		up: if (stones.get(index + size).getColor() != color) {
+			int opponentGroup = stones.get(index + size).getGroup();
+			for (Stone s : groups.get(opponentGroup)) {
+				if (searchLibertyOpponent(s.getIndex(), index)) {
+					break up;
+				}
+			}
+			System.out.println("legal - killing group under");
+			return true;
+		}
+		up: if (stones.get(index - 1).getColor() != color) {
+			int opponentGroup = stones.get(index - 1).getGroup();
+			for (Stone s : groups.get(opponentGroup)) {
+				if (searchLibertyOpponent(s.getIndex(), index)) {
+					break up;
+				}
+			}
+			System.out.println("legal - killing group on the left");
+			return true;
+		}
+		up: if (stones.get(index + 1).getColor() != color) {
+			int opponentGroup = stones.get(index + 1).getGroup();
+			for (Stone s : groups.get(opponentGroup)) {
+				if (searchLibertyOpponent(s.getIndex(), index)) {
+					break up;
+				}
+			}
+			System.out.println("legal - killing group on the right");
+			return true;
+		}
+		
+		
+		
+		
+		System.out.println("illegal - none condition true");
+		return false;
+	}
+	
 }
