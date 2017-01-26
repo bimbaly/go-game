@@ -1,5 +1,5 @@
 package go;
 
 public enum StoneColor {
-	BLACK, WHITE
+	BLACK, WHITE, GHOST, NONE
 }

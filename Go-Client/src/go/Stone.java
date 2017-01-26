@@ -3,26 +3,25 @@ package go;
 public class Stone {
 	
 	private static int groupIterator = 0;
+	private StoneColor color;
 	private int groupIndex;
 	private int stoneIndex;
-	private StoneColor color;
 	
-	public Stone(StoneColor color) {
+	public Stone(StoneColor color, int index) {
 		
-		this.groupIndex = groupIterator++;
 		this.color = color;
+		this.groupIndex = groupIterator++;
+		this.stoneIndex = index;
+		
 	}
 
-	
 	public StoneColor getColor() {
 		return color;
 	}
-
-
+	
 	public int getIndex() {
 		return stoneIndex;
 	}
-	
 	
 	public int getGroup() {
 		return groupIndex;
@@ -31,11 +30,9 @@ public class Stone {
 	public void setGroup(int group) {
 		this.groupIndex = group;
 	}
-	
-
 
 	public String toString() {
-		return "[" + stoneIndex + " " + color + "] ";
+		return "[" + stoneIndex + " " + color + " " + groupIndex + "] ";
 	}
 	
 }
