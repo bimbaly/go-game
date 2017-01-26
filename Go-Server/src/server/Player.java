@@ -1,41 +1,28 @@
 package server;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.List;
 
 public class Player implements Runnable {
 	
-	int id;
-	Protocol protocol;
-	private Socket socket;
-	private View view;
-	private BufferedReader input;
+	private View view;	
+	private Connection connection;
+	private Protocol protocol;
+	private int id;
 	
-	public Player(int id, Socket socket, List<Player> players, View view) {
+	public Player(int id, Socket socket, List<Player> players, View view) throws IOException {
 		this.id = id;
-		this.socket = socket;
 		this.view = view;
-		protocol = new Protocol(id, socket, players);
+		connection = new Connection(socket);
+		protocol = new Protocol(connection);
 	}
 		
 	public void run() {
-		view.setLog(id + ": connected");
-		try {
-			input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			String inputMsg;
-			try {
-				while((inputMsg = input.readLine()) != null) {
-					protocol.process(inputMsg);
-					//view.setLog(id + " : " + inputMsg);
-				}
-			} catch (IOException e1) {
-				view.setLog(id + ": disconnected");
-			}
-		} catch (IOException e) {
-			view.setLog(id + ": unable to initialize streams");
-		}		
+		
+	}
+	
+	public Connection getConnection() {
+		return connection;
 	}
 }
