@@ -2,40 +2,47 @@ package server;
 
 import java.io.IOException;
 
-public class ConfigPhase implements Phase {
+public class ConfigPhase extends Phase {
 	
-	private Connection connection;
-	private Phase phase;
+	private final int id;
+	private PlayerHandler handler;
 	
-	public ConfigPhase(Connection connection, Phase phase) {
-		this.connection = connection;
+	public ConfigPhase(int id, PlayerHandler handler) {
+		super(id, handler);
+		this.id = id;
+		this.handler = handler;
 	}
-
-	public boolean process(String input) {
+	
+	public boolean process(String input) throws IOException {
 		String[] inputDataArray = input.split("/");
-		switch (inputDataArray[0]) {
-		case "create":
-			String output = "game/" + inputDataArray[1] + inputDataArray[2] + inputDataArray[3];
-			try {
-				connection.sendToAll(output);
-				//phase = new PlayingPhase();
-				return true;
-			} catch (IOException e) {
-				return false;
-			}
 		
-		case "join":
+		switch (inputDataArray[0]) {
+			case "connect":
+				sendGames();
+				return false;
+				
+			case "create":
+				handler.addGame(inputDataArray[1] + "/" + inputDataArray[2], id);
+				handler.setStatus(id, true);
+				sendToAllExcept("game/" + id + "/" + inputDataArray[1] + "/" + inputDataArray[2], id);
+				return true;
 			
-			phase = new PlayingPhase();
-			return true;
-			
-		case "bot":
-			
-			phase = new BotPhase();
-			return true;
-			
-		default: 
-			return false;
+			case "join":
+				int enemyId = Integer.parseInt(inputDataArray[1]);
+				if(handler.getStatus(enemyId)) {
+					handler.setStatus(enemyId, false);
+					handler.removeGame(enemyId);
+					//sendGames();
+					sendToEnemy("found/"+ id, enemyId);
+					send("allow/");
+					return true;
+				} else {
+					//sendGames();
+					return false;
+				}
+				
+			default: 
+				return false;
 		}
 	}
 }

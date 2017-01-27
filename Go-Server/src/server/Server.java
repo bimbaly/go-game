@@ -1,11 +1,12 @@
 package server;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Server {
 	
@@ -14,13 +15,19 @@ public class Server {
 	private int port;
 	private ServerSocket serverSocket;
 	private Socket playerSocket;
+	
 	private int playerId = 0;
-	private List<Player> players;
+	private Map<Integer, PlayerData> players;
+	private Map<Integer, String> games;
+	
+	private PlayerHandler handler;
 	
 	public Server (int port) {
 		this.port = port;
 		view = new View();
-		players = Collections.synchronizedList(new ArrayList<Player>());
+		players = new HashMap<Integer, PlayerData>();
+		games = new HashMap<Integer, String>();
+		handler = new PlayerHandler(players, games);
 	}
 	
 	public void launch() {
@@ -29,8 +36,9 @@ public class Server {
 			view.setLog("started");
 			while(!serverSocket.isClosed()) {
 				playerSocket = serverSocket.accept();
-				players.add(new Player(playerId, playerSocket, players, view));
-				new Thread(players.get(playerId++)).start();
+				players.put(playerId, new PlayerData(false, new ObjectOutputStream(playerSocket.getOutputStream())));
+				
+				new Thread(new Player(playerId++, handler, playerSocket, view)).start();
 			}
 			serverSocket.close();
 		} catch (IOException e) {
