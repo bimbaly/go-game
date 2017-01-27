@@ -12,10 +12,26 @@ public class Board {
 	private Map<Integer, Stone> stones = new HashMap<Integer, Stone>();
 	private Map<Integer, HashSet<Stone>> groups = new HashMap<Integer, HashSet<Stone>>();
 	
+
 	public Board(int size) {
 		
 		this.size = size;
 		
+	}
+	
+	public Map<Integer, Stone> getStones() {
+		return stones;
+	}
+	
+	public StoneColor getStoneColor(int row, int col) {
+		
+		int index = row + 1 + col * size;
+		
+		if (stones.get(index) == null) {
+			return StoneColor.NONE;
+		}
+		
+		return stones.get(index).getColor();
 	}
 	
 	public Stone getStone(int row, int col) {
@@ -40,7 +56,7 @@ public class Board {
 		
 	}
 	
-	private void connectWithNeighbours(int index) {
+private void connectWithNeighbours(int index) {
 		
 		if (stones.get(index - size) != null && stones.get(index - size).getColor() == PlayerColor) {		//up
 			int neighbourGroup = stones.get(index - size).getGroup();
@@ -89,11 +105,12 @@ public class Board {
 			    if (hasLiberty(s.getIndex())) {
 			    	continue groups;
 			    }
-			    if (g.size() == 1) {
-					Stone.setLastCapturedIndex(s.getIndex());
-				}
+			}
+			if (g.size() == 1) {
+				Stone.setLastCapturedIndex(g.iterator().next().getIndex());
 			}
 			for (Stone s : g) {
+				System.out.println(s.toString() + " captured");
 			   stones.remove(s.getIndex());
 			}
 			g.clear();
@@ -171,6 +188,11 @@ public class Board {
 		int index = row + 1 + col * size;
 		
 		System.out.print(row + "x" + col + " ");
+		
+		if (!(index > 0 && index <= size*size)) {
+			System.out.println("outside the board");
+			return false;
+		}
 		
 		if (stones.get(index) != null) {
 			System.out.println("ILLEGAL - occupied");
