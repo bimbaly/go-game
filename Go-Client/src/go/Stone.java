@@ -7,13 +7,19 @@ public class Stone {
 	private int groupIndex;
 	private int stoneIndex;
 	public static int lastCapturedIndex;
+	private static int lastMoveIndex;
 	
 	public Stone(StoneColor color, int index) {
 		
 		this.color = color;
 		this.groupIndex = groupIterator++;
 		this.stoneIndex = index;
+		Stone.lastMoveIndex = index;
 		
+	}
+
+	public static int getLastMoveIndex() {
+		return lastMoveIndex;
 	}
 
 	public StoneColor getColor() {

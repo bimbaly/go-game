@@ -23,17 +23,6 @@ public class Board {
 		return stones;
 	}
 	
-	public StoneColor getStoneColor(int row, int col) {
-		
-		int index = row + 1 + col * size;
-		
-		if (stones.get(index) == null) {
-			return StoneColor.NONE;
-		}
-		
-		return stones.get(index).getColor();
-	}
-	
 	public Stone getStone(int row, int col) {
 		int index = row + 1 + col * size;
 		return stones.get(index);
@@ -52,7 +41,7 @@ public class Board {
 		groups.get(stone.getGroup()).add(stone);
 		
 		connectWithNeighbours(index);
-		updateBoard();
+		updateBoard(index);
 		
 	}
 	
@@ -98,11 +87,11 @@ private void connectWithNeighbours(int index) {
 		
 	}
 	
-	private void updateBoard() {
+	private void updateBoard(int index) {
 
 		groups: for (HashSet<Stone> g : groups.values()) {
 			for (Stone s : g) {
-			    if (hasLiberty(s.getIndex())) {
+			    if (s.getIndex() == index || hasLiberty(s.getIndex())) {
 			    	continue groups;
 			    }
 			}
@@ -141,7 +130,7 @@ private void connectWithNeighbours(int index) {
 	
 	private boolean areStonesCaptured(int index, int opponentIndex, StoneColor color) {
 		
-		if (!(stones.get(opponentIndex) != null && stones.get(opponentIndex).getColor() != color)) {
+		if (stones.get(opponentIndex) != null && stones.get(opponentIndex).getColor() == color) {
 			return false;
 		}
 		int opponentGroup = stones.get(opponentIndex).getGroup();
@@ -165,11 +154,14 @@ private void connectWithNeighbours(int index) {
 	
 	private boolean areFriendsAlive(int index, int neighbourIndex, StoneColor color) {
 		
-		if (!(stones.get(neighbourIndex) != null && stones.get(neighbourIndex).getColor() == color)) {
+		System.out.println("testing " + neighbourIndex);
+		
+		if (stones.get(neighbourIndex) != null && stones.get(neighbourIndex).getColor() != color) {
+			System.out.println(stones.get(neighbourIndex).getColor());
 			return false;
 		}
 		int friendGroup = stones.get(neighbourIndex).getGroup();
-		
+		System.out.println("testing group " + friendGroup);
 		
 		for (Stone s : groups.get(friendGroup)) {
 			if (hasLibertyAfterMove(s.getIndex(), index)) {
@@ -204,15 +196,15 @@ private void connectWithNeighbours(int index) {
 			return true;
 		}
 		
-		if (areStonesCaptured(index, index - size, color) ||
-			areStonesCaptured(index, index + size, color) ||
-			areStonesCaptured(index, index - 1, color) ||
-			areStonesCaptured(index, index + 1, color)) {
+		if (index - size > 0 && areStonesCaptured(index, index - size, color) ||
+			index + size <= size*size && areStonesCaptured(index, index + size, color) ||
+			index - 1 > 0 && areStonesCaptured(index, index - 1, color) ||
+			index + 1 <= size*size && areStonesCaptured(index, index + 1, color)) {
 			return true;
-		} else if (areFriendsAlive(index, index - size, color) ||
-					areFriendsAlive(index, index + size, color) ||
-					areFriendsAlive(index, index - 1, color) ||
-					areFriendsAlive(index, index + 1, color)) {
+		} else if (index - size > 0 && areFriendsAlive(index, index - size, color) ||
+				index + size <= size*size && areFriendsAlive(index, index + size, color) ||
+				index - 1 > 0 && areFriendsAlive(index, index - 1, color) ||
+				index + 1 <= size*size && areFriendsAlive(index, index + 1, color)) {
 			return true;
 		} else {
 			System.out.println("ILLEGAL - suicide move");

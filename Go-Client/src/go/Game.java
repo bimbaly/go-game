@@ -1,5 +1,4 @@
 package go;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -10,7 +9,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -96,18 +94,18 @@ public class Game implements Runnable {
 			gameGraphics.drawStone(g2d, stone);
 		}
 		
-		StoneColor cl;
-		Stone ghost;
+		StoneColor ghostCL;
+		StoneColor stoneCL;
 		if (counter%2 == 0) {
-			cl = StoneColor.BLACK;
-			ghost = new Stone(StoneColor.BLACK_GHOST, ghostX + 1 + ghostY * size);
+			ghostCL = StoneColor.BLACK_GHOST;
+			stoneCL = StoneColor.BLACK;
 		} else {
-			cl = StoneColor.WHITE;
-			ghost = new Stone(StoneColor.WHITE_GHOST, ghostX + 1 + ghostY * size);
+			ghostCL = StoneColor.WHITE_GHOST;
+			stoneCL = StoneColor.WHITE;
 		}
 		
-		if (gameBoard.isMovelegal(ghostX, ghostY, cl)) 
-			gameGraphics.drawStone(g2d, ghost);
+		if (gameBoard.isMovelegal(ghostX, ghostY, stoneCL)) 
+			gameGraphics.drawGhost(g2d, ghostX, ghostY, ghostCL);
 
 	}
 	

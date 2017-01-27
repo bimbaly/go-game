@@ -4,7 +4,7 @@ public class MainGUI {
 	
 	public MainGUI() {
 		
-		new Game(19);
+		new Game(9);
 		
 	}
 

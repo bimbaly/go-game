@@ -8,14 +8,16 @@ public class GameGraphics {
 
 	public static final Color BLACK_BG = Color.black;
 	public static final Color BLACK_STROKE = Color.white;
-	public static final Color BLACK_GHOST = new Color(40, 40, 40, 200);
+	public static final Color BLACK_GHOST = new Color(0, 0, 0, 200);
 	
 	public static final Color WHITE_BG = new Color(235, 235, 235);
 	public static final Color WHITE_STROKE = Color.white;
-	public static final Color WHITE_GHOST = new Color(220, 220, 220, 200);
+	public static final Color WHITE_GHOST = new Color(235, 235, 235, 200);
 	
 	public static final Color BOARD_BG = new Color(251, 197, 53);
 	public static final Color BOARD_FG = Color.black;
+	
+	public static final Color LAST_MOVE_HIGHLIGHT = Color.red;
 	
 	private int space, size;
 	
@@ -58,10 +60,6 @@ public class GameGraphics {
 			g2d.setColor(BLACK_BG);
 		else if (stone.getColor() == StoneColor.WHITE)
 			g2d.setColor(WHITE_BG);
-		else if (stone.getColor() == StoneColor.BLACK_GHOST)
-			g2d.setColor(BLACK_GHOST);
-		else if (stone.getColor() == StoneColor.WHITE_GHOST)
-			g2d.setColor(WHITE_GHOST);
 		
 		g2d.fillOval(xx, yy, space, space);
 		
@@ -70,33 +68,24 @@ public class GameGraphics {
 			g2d.setStroke(new BasicStroke(space/16));
 			g2d.drawArc(xx+space/6/2, yy+space/6/2, space-space/6, space-space/6, 30, 30);
 		}
+		
+		if (stone.getIndex() == Stone.getLastMoveIndex()) {
+			g2d.setColor(LAST_MOVE_HIGHLIGHT);
+			g2d.drawOval(xx, yy, space, space);
+		}
 			
+	}
+	
+	public void drawGhost(Graphics2D g2d, int x, int y, StoneColor color) {
+		if (color == StoneColor.BLACK_GHOST)
+			g2d.setColor(BLACK_GHOST);
+		if (color == StoneColor.WHITE_GHOST)
+			g2d.setColor(WHITE_GHOST);
 		
+		int xx = x*space+space/2;
+		int yy = y*space+space/2;
 		
-//		if (color == StoneColor.BLACK) {
-//		g2d.setColor(Color.black);
-//		g2d.fillOval(x, y, space, space);
-////		g2d.setColor(Color.white);
-////		g2d.setStroke(new BasicStroke(SPACE/28f));
-////		g2d.drawArc(x+SPACE/6/2, y+SPACE/6/2, SPACE-SPACE/6, SPACE-SPACE/6, 0, 90);
-//	}
-//	if (color == StoneColor.WHITE) {
-//		g2d.setColor(new Color(245, 245, 245));
-//		g2d.fillOval(x, y, space, space);
-////		g2d.setColor(Color.white);
-////		g2d.setStroke(new BasicStroke(SPACE/28f));
-////		g2d.drawArc(x+SPACE/6/2, y+SPACE/6/2, SPACE-SPACE/6, SPACE-SPACE/6, 0, 90);
-//	}
-//	if (color == StoneColor.GHOST) {
-//		if (counter%2 == 0) {
-//			g2d.setColor(new Color(40, 40, 40, 200));
-//		} else {
-//			g2d.setColor(new Color(220, 220, 220, 200));
-//		}
-//		
-//		g2d.fillOval(x, y, space, space);
-//	}
-		
+		g2d.fillOval(xx, yy, space, space);
 	}
 	
 }
