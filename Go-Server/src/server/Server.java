@@ -25,8 +25,8 @@ public class Server {
 	public Server (int port) {
 		this.port = port;
 		view = new View();
-		players = new HashMap<Integer, PlayerData>();
-		games = new HashMap<Integer, String>();
+		players = Collections.synchronizedMap(new HashMap<Integer, PlayerData>());
+		games = Collections.synchronizedMap(new HashMap<Integer, String>());
 		handler = new PlayerHandler(players, games);
 	}
 	
@@ -36,8 +36,7 @@ public class Server {
 			view.setLog("started");
 			while(!serverSocket.isClosed()) {
 				playerSocket = serverSocket.accept();
-				players.put(playerId, new PlayerData(false, new ObjectOutputStream(playerSocket.getOutputStream())));
-				
+				players.put(playerId, new PlayerData(new ObjectOutputStream(playerSocket.getOutputStream())));
 				new Thread(new Player(playerId++, handler, playerSocket, view)).start();
 			}
 			serverSocket.close();

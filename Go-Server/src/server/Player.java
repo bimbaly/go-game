@@ -29,6 +29,7 @@ public class Player implements Runnable {
 			} catch (ClassNotFoundException e) {
 				break;
 			} catch (IOException e) {
+				
 				break;
 			}
 		}

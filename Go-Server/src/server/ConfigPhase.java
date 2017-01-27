@@ -2,13 +2,12 @@ package server;
 
 import java.io.IOException;
 
-public class ConfigPhase extends Phase {
+public class ConfigPhase implements Phase {
 	
 	private final int id;
 	private PlayerHandler handler;
 	
 	public ConfigPhase(int id, PlayerHandler handler) {
-		super(id, handler);
 		this.id = id;
 		this.handler = handler;
 	}
@@ -18,26 +17,29 @@ public class ConfigPhase extends Phase {
 		
 		switch (inputDataArray[0]) {
 			case "connect":
-				sendGames();
+				//sendGames(id);
 				return false;
 				
 			case "create":
 				handler.addGame(inputDataArray[1] + "/" + inputDataArray[2], id);
-				handler.setStatus(id, true);
-				sendToAllExcept("game/" + id + "/" + inputDataArray[1] + "/" + inputDataArray[2], id);
+				handler.getData(id).setGameStatus(true);
+				//sendGamesToAll(id);
+				handler.send("start/", id);
 				return true;
 			
 			case "join":
 				int enemyId = Integer.parseInt(inputDataArray[1]);
-				if(handler.getStatus(enemyId)) {
-					handler.setStatus(enemyId, false);
+				if(handler.getData(enemyId).getGameStatus()) {
+					handler.getData(enemyId).setGameStatus(false);
 					handler.removeGame(enemyId);
-					//sendGames();
-					sendToEnemy("found/"+ id, enemyId);
-					send("allow/");
+					handler.getData(id).setEnemyId(enemyId);
+					handler.getData(enemyId).setEnemyId(id);
+					handler.send("start/", id);
+					//sendGamesToAll(id);
 					return true;
 				} else {
-					//sendGames();
+					handler.send("busy/", id);
+					//sendGames(id);
 					return false;
 				}
 				

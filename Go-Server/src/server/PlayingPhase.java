@@ -2,27 +2,28 @@ package server;
 
 import java.io.IOException;
 
-public class PlayingPhase extends Phase {
+public class PlayingPhase implements Phase {
 	
-	private int enemyId;
+	private final int id;
+	private final int enemyId;
+	private PlayerHandler handler;
 
 	public PlayingPhase(int id, PlayerHandler handler) {
-		super(id, handler);
-		// TODO Auto-generated constructor stub
+		this.id = id;
+		this.handler = handler;
+		enemyId = handler.getData(id).getEnemyId();
 	}
 
 	public boolean process(String input) throws IOException {
+		
 		String[] inputDataArray = input.split("/");
 		switch (inputDataArray[0]) {
-		case "setup":
-			enemyId = Integer.parseInt(inputDataArray[1]);
-			return false;
 		case "move":
-			sendToEnemy(inputDataArray[1], enemyId);
+			handler.send(inputDataArray[1], enemyId);
 			return false;
 			
 		case "pass": 
-			
+			handler.send("pass/", enemyId);
 			return false;
 		
 		case "count":

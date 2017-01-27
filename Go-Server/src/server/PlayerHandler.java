@@ -1,6 +1,6 @@
 package server;
 
-import java.io.ObjectOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -14,34 +14,34 @@ public class PlayerHandler {
 		this.games = games;
 	}
 	
-	public boolean getStatus(int id) {
-		return players.get(id).getStatus();
+	public PlayerData getData(int id) {
+		return players.get(id);
 	}
 	
-	public void setStatus(int id, boolean status) {
-		players.get(id).setStatus(status);
+	public void send(Object out, int id) throws IOException {
+		players.get(id).getOutput().writeObject(out);
+		players.get(id).getOutput().flush();
 	}
 	
-	public ObjectOutputStream getOutput(int id) {
-		return players.get(id).getOutput();
-	}
-	
-	public ArrayList<Integer> getKeys() {
-		ArrayList<Integer> keys = new ArrayList<Integer>();
+	public void sendToAll(Object out, int id) throws IOException {
 		for (Integer key : players.keySet()) {
-			keys.add(key);
+			send(out, key);
 		}
-		return keys;
 	}
+		
+	public synchronized void removePlayer(int id) {
+		players.remove(id);
+	}
+	
 	public Map<Integer, String> getGames() {
 		return games;
 	}
 	
-	public void addGame(String game, int gameId) {
+	public synchronized void addGame(String game, int gameId) {
 		games.put(gameId, game);
 	}
 	
-	public void removeGame(int gameId) {
+	public synchronized void removeGame(int gameId) {
 		games.remove(gameId);
 	}
 }
