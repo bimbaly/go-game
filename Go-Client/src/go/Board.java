@@ -196,15 +196,15 @@ private void connectWithNeighbours(int index) {
 			return true;
 		}
 		
-		if (index - size > 0 && areStonesCaptured(index, index - size, color) ||
-			index + size <= size*size && areStonesCaptured(index, index + size, color) ||
-			index - 1 > 0 && areStonesCaptured(index, index - 1, color) ||
-			index + 1 <= size*size && areStonesCaptured(index, index + 1, color)) {
+		if (areStonesCaptured(index, index - size, color) ||
+			areStonesCaptured(index, index + size, color) ||
+			areStonesCaptured(index, index - 1, color) ||
+			areStonesCaptured(index, index + 1, color)) {
 			return true;
-		} else if (index - size > 0 && areFriendsAlive(index, index - size, color) ||
-				index + size <= size*size && areFriendsAlive(index, index + size, color) ||
-				index - 1 > 0 && areFriendsAlive(index, index - 1, color) ||
-				index + 1 <= size*size && areFriendsAlive(index, index + 1, color)) {
+		} else if (areFriendsAlive(index, index - size, color) ||
+				areFriendsAlive(index, index + size, color) ||
+				areFriendsAlive(index, index - 1, color) ||
+				areFriendsAlive(index, index + 1, color)) {
 			return true;
 		} else {
 			System.out.println("ILLEGAL - suicide move");
