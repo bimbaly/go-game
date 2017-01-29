@@ -27,11 +27,19 @@ public class PlayingPhase implements Phase {
 			return false;
 		
 		case "count":
-			
+			handler.send("count/", enemyId);
 			return true;
+			
+		case "exit":
+			
+			return false;
+			
+		case "surrender": 
+			
+			handler.send("win/", enemyId);
+			return false;
 			
 		default: return false;
 		}
 	}
-
 }

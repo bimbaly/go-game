@@ -24,4 +24,8 @@ public class Protocol {
 	public void nextPhase() {
 		currentPhaseNumber++;
 	}
+	
+	public int getPhase() {
+		return currentPhaseNumber;
+	}
 }

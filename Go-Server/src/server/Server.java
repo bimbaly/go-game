@@ -1,7 +1,10 @@
 package server;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collections;
@@ -19,30 +22,27 @@ public class Server {
 	private int playerId = 0;
 	private Map<Integer, PlayerData> players;
 	private Map<Integer, String> games;
-	
-	private PlayerHandler handler;
+	private PlayerDataHandler data;
 	
 	public Server (int port) {
 		this.port = port;
 		view = new View();
 		players = Collections.synchronizedMap(new HashMap<Integer, PlayerData>());
 		games = Collections.synchronizedMap(new HashMap<Integer, String>());
-		handler = new PlayerHandler(players, games);
+		data = new PlayerDataHandler(players, games);
 	}
 	
 	public void launch() {
 		try {
 			serverSocket = new ServerSocket(port);
 			view.setLog("started");
-			while(!serverSocket.isClosed()) {
+			while(true) {
 				playerSocket = serverSocket.accept();
-				players.put(playerId, new PlayerData(new ObjectOutputStream(playerSocket.getOutputStream())));
-				new Thread(new Player(playerId++, handler, playerSocket, view)).start();
+				players.put(playerId, new PlayerData(new PrintWriter(playerSocket.getOutputStream(), true)));
+				new Thread(new PlayerThread(playerId++, data, playerSocket, view)).start();
 			}
-			serverSocket.close();
 		} catch (IOException e) {
 			view.setLog("unable to create server on specific port");
 		}
 	}
-	
 }  

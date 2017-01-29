@@ -1,53 +1,25 @@
 package server;
 
-import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 
 public class PlayerData {
 	
-	private boolean gameStatus = false;
-	private boolean winner = false;
-	private boolean looser = false;
-	private int enemyId;
+	private final PrintWriter output;
+	private boolean busy = true;
 	
-	private final ObjectOutputStream output;
-	
-	public PlayerData(ObjectOutputStream output) {
+	public PlayerData(PrintWriter output) {
 		this.output = output;
 	}
 
-	public ObjectOutputStream getOutput() {
+	public boolean isBusy() {
+		return busy;
+	}
+
+	public void setBusy(boolean busy) {
+		this.busy = busy;
+	}
+
+	public PrintWriter getOutput() {
 		return output;
-	}
-	
-	public int getEnemyId() {
-		return enemyId;
-	}
-
-	public void setEnemyId(int enemyId) {
-		this.enemyId = enemyId;
-	}
-	
-	public boolean getGameStatus() {
-		return gameStatus;
-	}
-	
-	public void setGameStatus(boolean gameStatus) {
-		this.gameStatus = gameStatus;
-	}
-	
-	public boolean isWinner() {
-		return winner;
-	}
-
-	public void setWinner(boolean winner) {
-		this.winner = winner;
-	}
-
-	public boolean isLooser() {
-		return looser;
-	}
-
-	public void setLooser(boolean looser) {
-		this.looser = looser;
 	}
 }
