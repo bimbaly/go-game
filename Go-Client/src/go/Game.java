@@ -104,7 +104,7 @@ public class Game implements Runnable {
 			stoneCL = StoneColor.WHITE;
 		}
 		
-		if (gameBoard.isMovelegal(ghostX, ghostY, stoneCL)) 
+		if (gameBoard.isMoveLegal(ghostX, ghostY, stoneCL)) 
 			gameGraphics.drawGhost(g2d, ghostX, ghostY, ghostCL);
 
 	}
@@ -143,8 +143,8 @@ public class Game implements Runnable {
 				}
 			} else {
 				if (ghostX != -100 && ghostY != -100) {
-					lastX = 0;
-					lastY = 0;
+					lastX = -1;
+					lastY = -1;
 					ghostX = -100;
 					ghostY = -100;
 					repaint();
@@ -160,15 +160,15 @@ public class Game implements Runnable {
 			}
 			int x = (e.getX() - space/2) / space;
 			int y = (e.getY() - space/2) / space;
-			System.out.println(x + " x " + y);
+//			System.out.println(x + " x " + y);
 			
 			if (x < size && y < size) {
 				if (counter%2 == 0) {
-					if (gameBoard.isMovelegal(x, y, StoneColor.BLACK)) {
+					if (gameBoard.isMoveLegal(x, y, StoneColor.BLACK)) {
 						gameBoard.addStone(x, y, StoneColor.BLACK);
 					}
 				} else {
-					if (gameBoard.isMovelegal(x, y, StoneColor.WHITE)) {
+					if (gameBoard.isMoveLegal(x, y, StoneColor.WHITE)) {
 						gameBoard.addStone(x, y, StoneColor.WHITE);
 					} 
 				}
