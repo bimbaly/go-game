@@ -27,7 +27,10 @@ public class Phase {
 		
 		case "disconnect":	
 			//close connection, remove player and end his thread
+			break;
 			
+		case "refresh":
+			loadGames();
 			break;
 			
 		case "create":
