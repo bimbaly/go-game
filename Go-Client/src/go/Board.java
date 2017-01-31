@@ -7,17 +7,18 @@ import java.util.Map;
 public class Board {
 	
 	private int size;
-	private StoneColor PlayerColor = StoneColor.BLACK;
+	private StoneColor playerColor, opponentColor;
 
 	private Map<Integer, Stone> stones = new HashMap<Integer, Stone>();
 	private Map<Integer, HashSet<Stone>> groups = new HashMap<Integer, HashSet<Stone>>();
 	
-//	private int captured = 0;
+	private boolean debug = false;
 	
-
-	public Board(int size) {
+	public Board(int size, StoneColor playerColor, StoneColor opponentColor) {
 		
 		this.size = size;
+		this.playerColor = playerColor;
+		this.opponentColor = opponentColor;
 		
 	}
 	
@@ -30,11 +31,7 @@ public class Board {
 		return stones.get(index);
 	}
 	
-	public void addStone(int row, int col, StoneColor color) {
-		
-		PlayerColor = color;
-		
-		int index = row + 1 + col * size;
+	public void addStone(int index, StoneColor color) {
 		
 		Stone stone = new Stone(color, index);
 		
@@ -49,22 +46,22 @@ public class Board {
 	
 private void connectWithNeighbours(int index) {
 		
-		if (stones.get(index - size) != null && stones.get(index - size).getColor() == PlayerColor) {		//up
+		if (stones.get(index - size) != null && stones.get(index - size).getColor() == playerColor) {		//up
 			int neighbourGroup = stones.get(index - size).getGroup();
 			mergeGroups(neighbourGroup, stones.get(index).getGroup());
 		}
-		if (stones.get(index + size) != null && stones.get(index + size).getColor() == PlayerColor) {		//down
+		if (stones.get(index + size) != null && stones.get(index + size).getColor() == playerColor) {		//down
 			int neighbourGroup = stones.get(index + size).getGroup();
 			mergeGroups(neighbourGroup, stones.get(index).getGroup());
 		}
-		if (stones.get(index - 1) != null && stones.get(index - 1).getColor() == PlayerColor) {			//left
+		if (stones.get(index - 1) != null && stones.get(index - 1).getColor() == playerColor) {			//left
 			if (index % size == 0 && (index - 1) % size == 1 || index % size == 1 && (index - 1) % size == 0) {
 			} else {
 				int neighbourGroup = stones.get(index - 1).getGroup();
 				mergeGroups(neighbourGroup, stones.get(index).getGroup());
 			}
 		}
-		if (stones.get(index + 1) != null && stones.get(index + 1).getColor() == PlayerColor) {			//right
+		if (stones.get(index + 1) != null && stones.get(index + 1).getColor() == playerColor) {			//right
 			if (index % size == 0 && (index + 1) % size == 1 || index % size == 1 && (index + 1) % size == 0) {
 			} else {
 				int neighbourGroup = stones.get(index + 1).getGroup();
@@ -216,26 +213,25 @@ private void connectWithNeighbours(int index) {
 	
 	public boolean isMoveLegal(int row, int col, StoneColor color) {
 		
-		if (MainGUI.debug)
+		if (debug)
 			System.out.print(row + " x " + col + " ");
 		
-		PlayerColor = color;
 		int index = row + 1 + col * size;
 		
 		if (isOutsideTheBoard(index)) {
-			if (MainGUI.debug)
+			if (debug)
 				System.out.println("ILLEGAL - outside the board");
 			return false;
 		}
 		
 		if (isOccupied(index)) {
-			if (MainGUI.debug)
+			if (debug)
 				System.out.println("ILLEGAL - occupied");
 			return false;
 		}
 		
 		if (hasLiberty(index)) {
-			if (MainGUI.debug)
+			if (debug)
 				System.out.println("LEGAL - at least one liberty");
 			return true;
 		}
@@ -253,7 +249,7 @@ private void connectWithNeighbours(int index) {
 			return true;
 		} 
 		
-		if (MainGUI.debug)
+		if (debug)
 			System.out.println("ILLEGAL - suicide move or ko rule");
 		return false;
 	}

@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 public class Client implements ActionListener {
 	
@@ -28,8 +29,9 @@ public class Client implements ActionListener {
 				//connection.send("connect");
 			} catch (IOException e) {
 				//dialog for invalid data
+				JOptionPane.showMessageDialog(null, "Unable to connect", "Connection error", JOptionPane.ERROR_MESSAGE);
 			}
-		} while (connection == null);
+		} while (connection != null);
 	}
 	
 	private void refresh() {
@@ -45,8 +47,13 @@ public class Client implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+//		if (connection == null) {
+//			return;
+//		}
 		if (e.getSource() == createBtn) {
-			System.out.println("create");
+			NewGameDialog newGameSettings = new NewGameDialog();
+			System.out.println("create " + newGameSettings.getSize() + " " + newGameSettings.getColorIndex());
+			new Game(newGameSettings.getSize(), newGameSettings.getColorIndex());
 		} else if (e.getSource() == joinBtn) {
 			System.out.println("join");
 		} else if (e.getSource() == refreshBtn) {

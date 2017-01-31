@@ -15,7 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
-public class Game implements Runnable {
+public class Game {
 
 	public static final int SCALE = 4;
 	public static final int WIDTH = 140 * SCALE;	//width should be multiple of 140 for 9x9, 13x13 and 19x19 board sizes
@@ -28,8 +28,10 @@ public class Game implements Runnable {
 	private Painter painter;
 	Graphics2D g2d;
 	
-	private int counter = 0;
 	private int size;
+	private StoneColor playerColor;
+	private StoneColor opponentColor;
+	private StoneColor ghostColor;
 	
 	private int ghostX = -100;
 	private int ghostY = -100;
@@ -42,8 +44,18 @@ public class Game implements Runnable {
 		this.size = size;
 		this.space = WIDTH/(size+1);
 		
+		if (colorIndex == 0) {
+			playerColor = StoneColor.BLACK;
+			ghostColor = StoneColor.BLACK_GHOST;
+			opponentColor = StoneColor.WHITE;
+		} else if (colorIndex == 1) {
+			playerColor = StoneColor.WHITE;
+			ghostColor = StoneColor.WHITE_GHOST;
+			opponentColor = StoneColor.BLACK;
+		}
+		
 		gameGraphics = new GameGraphics(size, space);
-		gameBoard = new Board(size);
+		gameBoard = new Board(size, playerColor, opponentColor);
 		
 		painter = new Painter();
 		painter.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -60,8 +72,8 @@ public class Game implements Runnable {
 			            "Are you sure you wish to leave this match?", "Exit?", 
 			            JOptionPane.YES_NO_OPTION,
 			            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-			            System.exit(0);
-//			            frame.dispose();
+//			            System.exit(0);
+			            frame.dispose();	//close only frame
 			        }
 			}
 		});
@@ -69,18 +81,6 @@ public class Game implements Runnable {
 		frame.setLocationRelativeTo(null);
 		frame.pack();
 		frame.setVisible(true);
-		
-		start();
-	}
-	
-	public synchronized void start() {
-		new Thread(this).start();
-	}
-	
-	public void run() {
-//			System.out.println("go");
-//			tick();
-//			painter.repaint();
 	}
 	
 	private void render(Graphics g) {
@@ -94,18 +94,8 @@ public class Game implements Runnable {
 			gameGraphics.drawStone(g2d, stone);
 		}
 		
-		StoneColor ghostCL;
-		StoneColor stoneCL;
-		if (counter%2 == 0) {
-			ghostCL = StoneColor.BLACK_GHOST;
-			stoneCL = StoneColor.BLACK;
-		} else {
-			ghostCL = StoneColor.WHITE_GHOST;
-			stoneCL = StoneColor.WHITE;
-		}
-		
-		if (gameBoard.isMoveLegal(ghostX, ghostY, stoneCL)) 
-			gameGraphics.drawGhost(g2d, ghostX, ghostY, ghostCL);
+		if (gameBoard.isMoveLegal(ghostX, ghostY, playerColor)) 
+			gameGraphics.drawGhost(g2d, ghostX, ghostY, ghostColor);
 
 	}
 	
@@ -160,24 +150,15 @@ public class Game implements Runnable {
 			}
 			int x = (e.getX() - space/2) / space;
 			int y = (e.getY() - space/2) / space;
-//			System.out.println(x + " x " + y);
 			
 			if (x < size && y < size) {
-				if (counter%2 == 0) {
-					if (gameBoard.isMoveLegal(x, y, StoneColor.BLACK)) {
-						gameBoard.addStone(x, y, StoneColor.BLACK);
-					}
-				} else {
-					if (gameBoard.isMoveLegal(x, y, StoneColor.WHITE)) {
-						gameBoard.addStone(x, y, StoneColor.WHITE);
-					} 
+				if (gameBoard.isMoveLegal(x, y, playerColor)) {
+					gameBoard.addStone(x+1+y*size, playerColor);
 				}
 			}
 			
 			repaint();
 			Toolkit.getDefaultToolkit().sync();
-			counter++;
-			
 		}
 		
 		@Override
