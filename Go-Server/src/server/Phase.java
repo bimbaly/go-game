@@ -31,6 +31,7 @@ public class Phase {
 			
 		case "refresh":
 			loadGames();
+			handler.send("done", id);
 			break;
 			
 		case "create":

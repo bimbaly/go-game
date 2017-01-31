@@ -7,7 +7,7 @@ public class MainGUI {
 	public MainGUI() {
 		
 //		new Game(9);
-		new ClientWindow();
+		new Client().initialize();
 		
 	}
 

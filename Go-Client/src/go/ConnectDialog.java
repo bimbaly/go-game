@@ -40,7 +40,7 @@ public class ConnectDialog {
 		return ip;
 	}
 
-	public String getPort() {
-		return port;
+	public int getPort() {
+		return Integer.parseInt(port);
 	}
 }

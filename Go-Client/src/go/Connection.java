@@ -31,4 +31,8 @@ public class Connection {
 	public void send(String msg) {
 		output.write(msg);
 	}
+	
+	public boolean isConnected() {
+		return socket.isConnected();
+	}
 }
