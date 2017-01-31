@@ -6,7 +6,8 @@ public class MainGUI {
 	
 	public MainGUI() {
 		
-		new Game(9);
+//		new Game(9);
+		new ClientWindow();
 		
 	}
 
