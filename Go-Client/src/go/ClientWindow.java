@@ -14,7 +14,7 @@ import javax.swing.JScrollPane;
 
 public class ClientWindow extends JFrame implements ActionListener {
 	
-	JButton createBtn, joinBtn;
+	JButton createBtn, joinBtn, refreshBtn;
 	
 	public ClientWindow() {
 		super("Go-Client (not connected)");
@@ -30,7 +30,10 @@ public class ClientWindow extends JFrame implements ActionListener {
 		createBtn.addActionListener(this);
 		joinBtn = new JButton("JOIN GAME");
 		joinBtn.addActionListener(this);
+		refreshBtn = new JButton("REFRESH");
+		refreshBtn.addActionListener(this);
 		buttonsPanel.add(createBtn);
+		buttonsPanel.add(refreshBtn);
 		buttonsPanel.add(joinBtn);
 		getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 		getContentPane().add(new JLabel("SELECT GAME:"), BorderLayout.NORTH);
@@ -44,9 +47,11 @@ public class ClientWindow extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == createBtn) {
-			new NewGameDialog();
+			NewGameDialog gameSettings = new NewGameDialog();
 		} else if (e.getSource() == joinBtn) {
 			System.out.println("join");
+		} else if (e.getSource() == refreshBtn) {
+			System.out.println("refresh");
 		}
 		
 	}

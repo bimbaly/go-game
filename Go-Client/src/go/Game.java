@@ -37,7 +37,7 @@ public class Game implements Runnable {
 	private GameGraphics gameGraphics;
 	private Board gameBoard;
 	
-	public Game(int size) {
+	public Game(int size, int colorIndex) {
 		
 		this.size = size;
 		this.space = WIDTH/(size+1);

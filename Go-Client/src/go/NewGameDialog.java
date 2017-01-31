@@ -9,6 +9,7 @@ public class NewGameDialog {
 		
 		String[] gameModeList = {"Two Player", "Single Player"};
 		String[] boardSizeList = {"9 x 9", "13 x 13", "19 x 19"};
+		int[] boardSizeValue = {9, 13, 19};
 		String[] playAsList = {"Black", "White"};
 		
 		JComboBox<String> gameMode = new JComboBox<String>(gameModeList);
