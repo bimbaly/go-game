@@ -1,7 +1,6 @@
 package server;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Map;
 
 public class PlayerDataHandler {
@@ -23,6 +22,29 @@ public class PlayerDataHandler {
 			if (key != id)
 				send(out, key);
 		}
+	}
+	
+	public void sendToAllExcept(String out, int id, int enemyId) throws IOException {
+		for (Integer key : players.keySet()) {
+			if (key != id && key != enemyId)
+				send(out, key);
+		}
+	}
+	
+	public int getEnemyId(int id) {
+		return players.get(id).getEnemyId();
+	}
+	
+	public void setEnemyId(int id, int enemyId) {
+		players.get(id).setEnemyId(enemyId);
+	}
+	
+	public boolean isPlaying(int id) {
+		return players.get(id).isPlaying();
+	}
+	
+	public void setPlaying(int id, boolean playing) {
+		players.get(id).setPlaying(playing);
 	}
 	
 	public boolean isBusy(int id) {
