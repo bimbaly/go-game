@@ -12,6 +12,8 @@ public class Board {
 	private Map<Integer, Stone> stones = new HashMap<Integer, Stone>();
 	private Map<Integer, HashSet<Stone>> groups = new HashMap<Integer, HashSet<Stone>>();
 	
+//	private int captured = 0;
+	
 
 	public Board(int size) {
 		
@@ -56,12 +58,18 @@ private void connectWithNeighbours(int index) {
 			mergeGroups(neighbourGroup, stones.get(index).getGroup());
 		}
 		if (stones.get(index - 1) != null && stones.get(index - 1).getColor() == PlayerColor) {			//left
-			int neighbourGroup = stones.get(index - 1).getGroup();
-			mergeGroups(neighbourGroup, stones.get(index).getGroup());
+			if (index % size == 0 && (index - 1) % size == 1 || index % size == 1 && (index - 1) % size == 0) {
+			} else {
+				int neighbourGroup = stones.get(index - 1).getGroup();
+				mergeGroups(neighbourGroup, stones.get(index).getGroup());
+			}
 		}
 		if (stones.get(index + 1) != null && stones.get(index + 1).getColor() == PlayerColor) {			//right
-			int neighbourGroup = stones.get(index + 1).getGroup();
-			mergeGroups(neighbourGroup, stones.get(index).getGroup());
+			if (index % size == 0 && (index + 1) % size == 1 || index % size == 1 && (index + 1) % size == 0) {
+			} else {
+				int neighbourGroup = stones.get(index + 1).getGroup();
+				mergeGroups(neighbourGroup, stones.get(index).getGroup());
+			}
 		}
 		
 	}
@@ -79,7 +87,7 @@ private void connectWithNeighbours(int index) {
 		groups.remove(oldGroupIndex);
 		
 		
-//		//print modified group
+		//print modified group
 //		for (Stone s : groups.get(newGroupIndex)) {
 //			System.out.print(s.toString());
 //		}
@@ -100,7 +108,7 @@ private void connectWithNeighbours(int index) {
 			}
 			for (Stone s : g) {
 				System.out.println(s.toString() + " captured");
-			   stones.remove(s.getIndex());
+				stones.remove(s.getIndex());
 			}
 			g.clear();
 		}
@@ -108,43 +116,59 @@ private void connectWithNeighbours(int index) {
 	}
 	
 	private boolean hasLiberty(int index) {
-		if (stones.get(index - size) == null && index - size > 0 || 
-			stones.get(index + size) == null && index + size <= size*size || 
-			stones.get(index - 1) == null && index - 1 > 0 || 
-			stones.get(index + 1) == null && index + 1 <= size*size) {
+		if (!isOutsideTheBoard(index - size) && !isOccupied(index - size) || 
+			!isOutsideTheBoard(index + size) && !isOccupied(index + size) || 
+			!isOutsideTheBoard(index - 1) && !isOccupied(index - 1) && (index - 1) % size != 0 || 
+			!isOutsideTheBoard(index + 1) && !isOccupied(index + 1) && (index + 1) % size != 1) {
 			return true;
 		}
 		return false;
 	}
 	
 	private boolean hasLibertyAfterMove(int index, int occupiedIndex) {
-		if (stones.get(index - size) == null && index - size > 0 && index - size != occupiedIndex || 
-				stones.get(index + size) == null && index + size <= size*size && index + size != occupiedIndex || 
-				stones.get(index - 1) == null && index - 1 > 0 && index - 1 != occupiedIndex || 
-				stones.get(index + 1) == null && index + 1 <= size*size && index + 1 != occupiedIndex) {
-				return true;
-			}
-			return false;
+		if (!isOutsideTheBoard(index - size) && !isOccupied(index - size) && index - size != occupiedIndex || 
+			!isOutsideTheBoard(index + size) && !isOccupied(index + size) && index + size != occupiedIndex || 
+			!isOutsideTheBoard(index - 1) && !isOccupied(index - 1) && (index - 1) % size != 0 && index - 1 != occupiedIndex || 
+			!isOutsideTheBoard(index + 1) && !isOccupied(index + 1) && (index + 1) % size != 1 && index + 1 != occupiedIndex) {
+			return true;
+		}
+		return false;
 	}
 	
+	private Stone getNeighbour(int index, int shift) {
+		if (shift == -1 && (index + shift) % size == 0 || shift == 1 && (index + shift) % size == 1) {	//not neighbour
+			return null;
+		}
+		if (!isOutsideTheBoard(index + shift) && isOccupied(index + shift)) {
+			return stones.get(index + shift);
+		}
+		return null;
+	}
+
+	private boolean areEnemiesCaptured(int index, int shift, StoneColor color) {
 	
-	private boolean areStonesCaptured(int index, int opponentIndex, StoneColor color) {
-		
-		if (stones.get(opponentIndex) != null && stones.get(opponentIndex).getColor() == color) {
+		if (getNeighbour(index, shift) == null) {
 			return false;
 		}
-		int opponentGroup = stones.get(opponentIndex).getGroup();
 		
+		Stone neighbour = getNeighbour(index, shift);
 		
-		for (Stone s : groups.get(opponentGroup)) {
+		if (neighbour.getColor() == color) {
+			return false;
+		}
+		
+		int enemyGroup = neighbour.getGroup();
+	
+	
+		for (Stone s : groups.get(enemyGroup)) {
 			if (hasLibertyAfterMove(s.getIndex(), index)) {
 				return false;
 			}
 		}
 		
 		//KO
-		if (groups.get(opponentGroup).size() == 1 && index == Stone.getLastCapturedIndex()) {
-			System.out.println("ILLEGAL - KO rule");
+		if (groups.get(enemyGroup).size() == 1 && index == Stone.getLastCapturedIndex()) {
+//			System.out.println("ILLEGAL - Ko rule");
 			return false;
 		}
 		
@@ -152,67 +176,86 @@ private void connectWithNeighbours(int index) {
 		return true;
 	}
 	
-	private boolean areFriendsAlive(int index, int neighbourIndex, StoneColor color) {
+	private boolean areAlliesAlive(int index, int shift, StoneColor color) {
 		
-		System.out.println("testing " + neighbourIndex);
-		
-		if (stones.get(neighbourIndex) != null && stones.get(neighbourIndex).getColor() != color) {
-			System.out.println(stones.get(neighbourIndex).getColor());
+		if (getNeighbour(index, shift) == null) {
 			return false;
 		}
-		int friendGroup = stones.get(neighbourIndex).getGroup();
-		System.out.println("testing group " + friendGroup);
 		
-		for (Stone s : groups.get(friendGroup)) {
+		Stone neighbour = getNeighbour(index, shift);
+		
+		if (neighbour.getColor() != color) {
+			return false;
+		}
+		
+		int allyGroup = neighbour.getGroup();
+	
+		for (Stone s : groups.get(allyGroup)) {
 			if (hasLibertyAfterMove(s.getIndex(), index)) {
 				System.out.println("LEGAL - group alive");
 				return true;
 			}
 		}
 		
-//		System.out.println("illegal - suicide move");
 		return false;
 	}
 	
-	public boolean isMovelegal(int row, int col, StoneColor color) {
+	private boolean isOutsideTheBoard(int index) {
+		if (!(index > 0 && index <= size*size)) {
+			return true;
+		}
+		return false;
+	}
+
+	private boolean isOccupied(int index) {
+		if (stones.get(index) != null) {
+			return true;
+		}
+		return false;
+	}
+	
+	public boolean isMoveLegal(int row, int col, StoneColor color) {
+		
+		if (MainGUI.debug)
+			System.out.print(row + " x " + col + " ");
 		
 		PlayerColor = color;
 		int index = row + 1 + col * size;
 		
-		System.out.print(row + "x" + col + " ");
-		
-		if (!(index > 0 && index <= size*size)) {
-			System.out.println("outside the board");
+		if (isOutsideTheBoard(index)) {
+			if (MainGUI.debug)
+				System.out.println("ILLEGAL - outside the board");
 			return false;
 		}
 		
-		if (stones.get(index) != null) {
-			System.out.println("ILLEGAL - occupied");
+		if (isOccupied(index)) {
+			if (MainGUI.debug)
+				System.out.println("ILLEGAL - occupied");
 			return false;
 		}
 		
 		if (hasLiberty(index)) {
-			System.out.println("LEGAL - at least one liberty");
+			if (MainGUI.debug)
+				System.out.println("LEGAL - at least one liberty");
 			return true;
 		}
 		
-		if (index - size > 0 && areStonesCaptured(index, index - size, color) ||
-			index + size <= size*size && areStonesCaptured(index, index + size, color) ||
-			index - 1 > 0 && areStonesCaptured(index, index - 1, color) ||
-			index + 1 <= size*size && areStonesCaptured(index, index + 1, color)) {
+		if (areEnemiesCaptured(index, -size, color) ||
+			areEnemiesCaptured(index, size, color) ||
+			areEnemiesCaptured(index, -1, color) ||
+			areEnemiesCaptured(index, 1, color)) {
 			return true;
-		} else if (index - size > 0 && areFriendsAlive(index, index - size, color) ||
-				index + size <= size*size && areFriendsAlive(index, index + size, color) ||
-				index - 1 > 0 && areFriendsAlive(index, index - 1, color) ||
-				index + 1 <= size*size && areFriendsAlive(index, index + 1, color)) {
-			return true;
-		} else {
-			System.out.println("ILLEGAL - suicide move");
-			return false;
 		}
+		if (areAlliesAlive(index, -size, color) ||
+			areAlliesAlive(index, size, color) ||
+			areAlliesAlive(index, -1, color) ||
+			areAlliesAlive(index, 1, color)) {
+			return true;
+		} 
 		
-//		System.out.println("illegal - none condition true");
-//		return false;
+		if (MainGUI.debug)
+			System.out.println("ILLEGAL - suicide move or ko rule");
+		return false;
 	}
 	
 }

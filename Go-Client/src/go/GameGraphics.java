@@ -10,7 +10,7 @@ public class GameGraphics {
 	public static final Color BLACK_STROKE = Color.white;
 	public static final Color BLACK_GHOST = new Color(0, 0, 0, 200);
 	
-	public static final Color WHITE_BG = new Color(235, 235, 235);
+	public static final Color WHITE_BG = new Color(230, 230, 230);
 	public static final Color WHITE_STROKE = Color.white;
 	public static final Color WHITE_GHOST = new Color(235, 235, 235, 200);
 	
@@ -69,9 +69,11 @@ public class GameGraphics {
 			g2d.drawArc(xx+space/6/2, yy+space/6/2, space-space/6, space-space/6, 30, 30);
 		}
 		
+		//last move highlight
 		if (stone.getIndex() == Stone.getLastMoveIndex()) {
 			g2d.setColor(LAST_MOVE_HIGHLIGHT);
 			g2d.drawOval(xx, yy, space, space);
+//			g2d.fillOval(xx+space/4*2, yy+space/4*2, space/4, space/4);
 		}
 			
 	}

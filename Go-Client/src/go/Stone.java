@@ -15,6 +15,7 @@ public class Stone {
 		this.groupIndex = groupIterator++;
 		this.stoneIndex = index;
 		Stone.lastMoveIndex = index;
+		setLastCapturedIndex(0);	//reset ko
 		
 	}
 

@@ -2,9 +2,11 @@ package go;
 
 public class MainGUI {
 	
+	public static final boolean debug = true;
+	
 	public MainGUI() {
 		
-		new Game(8);
+		new Game(9);
 		
 	}
 
