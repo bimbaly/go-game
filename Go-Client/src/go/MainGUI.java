@@ -23,11 +23,12 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 	
 	private JFrame frame;
 	private JButton createBtn, joinBtn, refreshBtn;
+	private JLabel infoLbl;
 	private TableOfActiveGames table;
 	private Connection connection;
 	private Thread gameThread;
 	
-	private int joinSize, joinColorIndex;
+	private int joinSize, joinColorIndex, joinPlayerID;
 	
 	/**
 	 * Launch the application.
@@ -79,7 +80,7 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 		buttonsPanel.add(refreshBtn);
 		buttonsPanel.add(joinBtn);
 		frame.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
-		frame.getContentPane().add(new JLabel("SELECT GAME:"), BorderLayout.NORTH);
+		frame.getContentPane().add(infoLbl = new JLabel(), BorderLayout.NORTH);
 //		frame.pack();
 	}
 	
@@ -93,17 +94,6 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 				JOptionPane.showMessageDialog(null, "Unable to connect", "Connection error", JOptionPane.ERROR_MESSAGE);
 			}
 		} while (connection == null);
-		
-//		try {																//REVERSE
-//			connection = new Connection("127.0.0.1", 2222);
-//		} catch (UnknownHostException e) {
-//			e.printStackTrace();
-//		} catch (IOException e) {
-//			System.out.println("Connection refused");
-//		}
-//		if (connection == null) {
-//			System.exit(0);
-//		}
 		
 		refresh();
 	}
@@ -120,11 +110,13 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 				if(array[0].equals("game")) {
 					Object[] row = {array[1], array[3], array[2]};
 					table.getTableModel().addRow(row);
-					System.out.println("adding row " + row);
+					System.out.println("adding row " + array[1] + " " + array[3] + " " + array[2]);
 				}
 				
 				System.out.println(input);
 			}
+			infoLbl.setText(Integer.toString(table.getTableModel().getRowCount()) + " games available");
+			
 		} catch (IOException e) {
 			connection.close();
 			connection = null;
@@ -143,11 +135,10 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 			gameThread = new Thread(new Game(newGameSettings.getSize(), newGameSettings.getColorIndex(), connection));
 			gameThread.start();
 		} else if (e.getSource() == joinBtn) {
-			connection.send("join/" + 0); // zawsze dolacza do 
+			connection.send("join/" + joinPlayerID);
 			gameThread = new Thread(new Game(joinSize, joinColorIndex, connection));
 			gameThread.start();
 		} else if (e.getSource() == refreshBtn) {
-//			table.getTableModel().removeRow(0);
 			refresh();
 			System.out.println("refresh");
 		}
@@ -172,9 +163,11 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 				joinColorIndex = 0;
 			}
 			joinSize = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 2).toString());
+			joinPlayerID = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0).toString());
 			
 			System.out.println("color = " + joinColorIndex);
 			System.out.println("size = " + joinSize);
+			System.out.println("id = " + joinPlayerID);
 			
 			joinBtn.setEnabled(true);
 		}

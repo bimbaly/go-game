@@ -8,7 +8,7 @@ public class Board {
 	
 	private int size;
 //	private StoneColor playerColor, opponentColor;
-
+	
 	private Map<Integer, Stone> stones = new HashMap<Integer, Stone>();
 	private Map<Integer, HashSet<Stone>> groups = new HashMap<Integer, HashSet<Stone>>();
 	
@@ -105,8 +105,11 @@ private void connectWithNeighbours(int index, StoneColor color) {
 			}
 			for (Stone s : g) {
 				System.out.println(s.toString() + " captured");
+				Stone.increaseCapturedCounter(1, s.getColor());
 				stones.remove(s.getIndex());
 			}
+			System.out.println("all black captured " + Stone.getCapturedCount(StoneColor.BLACK));
+			System.out.println("all white captured " + Stone.getCapturedCount(StoneColor.WHITE));
 			g.clear();
 		}
 		

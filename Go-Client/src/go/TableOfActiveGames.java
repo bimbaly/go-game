@@ -10,10 +10,9 @@ import javax.swing.table.DefaultTableModel;
 
 public class TableOfActiveGames extends JTable {
 	
-	private DefaultTableCellRenderer customRenderer = new DefaultTableCellRenderer();
 	private DefaultTableModel tableModel = new DefaultTableModel();
 	
-	private static String[] columnHeaders = {"ID", "Color", "Size"};
+	private static final String[] HEADERS = {"ID", "Your color", "Size"};
 	
 	public TableOfActiveGames() {
 //		super();
@@ -27,15 +26,9 @@ public class TableOfActiveGames extends JTable {
 		setFillsViewportHeight(true);
 		setSelectionBackground(new Color(48, 44, 40));
 		setSelectionForeground(new Color(241, 240, 239));
-		tableModel.setColumnIdentifiers(columnHeaders);
+		tableModel.setColumnIdentifiers(HEADERS);
 		setModel(tableModel);
-		
-//		Object[] x = {"0", "0", "19"};
-//		Object[] y = {"0", "1", "19"};
-//		tableModel.addRow(x); 
-//		tableModel.addRow(y); 
-//		tableModel.addRow(x); 
-//		tableModel.addRow(x); 
+
 	}
 
 	public DefaultTableModel getTableModel() {

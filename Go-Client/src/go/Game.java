@@ -1,9 +1,13 @@
 package go;
+import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -11,16 +15,18 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 
 public class Game implements Runnable {
 
 	public static final int SCALE = 4;
 	public static final int WIDTH = 140 * SCALE;	//width should be multiple of 140 for 9x9, 13x13 and 19x19 board sizes
-	public static final int HEIGHT = WIDTH + 80;	
+	public static final int HEIGHT = WIDTH + 50;	
 	public static final String NAME = "go";
 	
 	private JFrame frame;
@@ -42,6 +48,8 @@ public class Game implements Runnable {
 	
 	private Connection connection;
 	
+	JButton surrenderBtn, passBtn;
+	
 	private boolean isAbleToMove = false;
 	
 	public Game(int size, int colorIndex, Connection connection) {
@@ -54,23 +62,22 @@ public class Game implements Runnable {
 			playerColor = StoneColor.BLACK;
 			ghostColor = StoneColor.BLACK_GHOST;
 			opponentColor = StoneColor.WHITE;
-//			isAbleToMove = true;
 		} else if (colorIndex == 1) {
 			playerColor = StoneColor.WHITE;
 			ghostColor = StoneColor.WHITE_GHOST;
 			opponentColor = StoneColor.BLACK;
-//			isAbleToMove = false;
 		}
 		
 		gameGraphics = new GameGraphics(size, space);
 		gameBoard = new Board(size, playerColor, opponentColor);
 		
 		painter = new Painter();
-		painter.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+		painter.setPreferredSize(new Dimension(WIDTH, WIDTH));
 		
 		frame = new JFrame(NAME + " " + playerColor);
-		frame.setContentPane(painter);
 		frame.setSize(WIDTH, HEIGHT);
+		frame.setResizable(false);
+		frame.setLocationRelativeTo(null);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		frame.addWindowListener(new WindowAdapter() {
 
@@ -80,13 +87,40 @@ public class Game implements Runnable {
 			            "Are you sure you wish to leave this match?", "Exit?", 
 			            JOptionPane.YES_NO_OPTION,
 			            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-			            System.exit(0);
-//			            frame.dispose();	//close only frame
+//			            System.exit(0);
+			            frame.dispose();	//close only frame
 			        }
 			}
 		});
-		frame.setResizable(false);
-		frame.setLocationRelativeTo(null);
+		
+		frame.setLayout(new BorderLayout());
+		frame.getContentPane().add(new JScrollPane(painter), BorderLayout.CENTER);
+		JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		surrenderBtn = new JButton("SURRENDER");
+		passBtn = new JButton("PASS");
+		passBtn.setPreferredSize(surrenderBtn.getPreferredSize());
+		passBtn.setEnabled(false);
+		surrenderBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("surrender");
+				connection.send("surrender");
+			}
+		});
+		passBtn.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("pass");
+				connection.send("pass");
+			}
+		});
+		buttonsPanel.add(surrenderBtn);
+		buttonsPanel.add(passBtn);
+		frame.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
+		
+		frame.pack();
 		frame.pack();
 		frame.setVisible(true);
 	}
@@ -172,6 +206,7 @@ public class Game implements Runnable {
 			if (x < size && y < size) {
 				if (isAbleToMove && gameBoard.isMoveLegal(x+1+y*size, playerColor)) {
 					isAbleToMove = false;
+					passBtn.setEnabled(false);
 					int move = x+1+y*size;
 					System.out.println(move);
 					connection.send("move/" + Integer.toString(move));
@@ -209,6 +244,7 @@ public class Game implements Runnable {
 					System.out.println(input);
 				if (playerColor == StoneColor.BLACK) {
 					isAbleToMove = true;
+					passBtn.setEnabled(true);
 				}
 					isAllowed = true;
 					break;
@@ -230,6 +266,7 @@ public class Game implements Runnable {
 					if(!isAbleToMove && array[0].equals("move")) {
 						painter.addStoneAndRepaint(Integer.parseInt(array[1]), opponentColor);
 						isAbleToMove = true;
+						passBtn.setEnabled(true);
 					}
 				}
 			} catch (IOException e) {
