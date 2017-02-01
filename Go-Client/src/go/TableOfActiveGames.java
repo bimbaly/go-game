@@ -1,24 +1,45 @@
 package go;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableColumn;
+import javax.swing.table.DefaultTableModel;
 
 public class TableOfActiveGames extends JTable {
 	
 	private DefaultTableCellRenderer customRenderer = new DefaultTableCellRenderer();
+	private DefaultTableModel tableModel = new DefaultTableModel();
 	
-	static String[] columnHeaders = {"Game ID", "Color", "Size"};
-	static String[][] dummyData = {{"0", "Black", "19 x 19"}, {"1", "Black", "19 x 19"}, {"2", "Black", "19 x 19"}, {"3", "Black", "13 x 13"}, {"4", "Black", "13 x 13"}, {"5", "White", "13 x 13"}, {"6", "White", "13 x 13"}, {"7", "White", "9 x 9"}, {"8", "White", "9 x 9"}, {"9", "White", "9 x 9"}, {"10", "White", "9 x 9"}};
+	private static String[] columnHeaders = {"ID", "Size", "Color"};
 	
 	public TableOfActiveGames() {
-		super(dummyData, columnHeaders);
-		setShowVerticalLines(false);
-//		setDefaultRenderer(getColumnClass(2), new customTableCellRenderer());
-		getColumnModel().getColumn(2).setCellRenderer(customRenderer);
+//		super();
+//		setShowHorizontalLines(true);
+		setShowGrid(false);
+		setDefaultRenderer(Object.class, new customTableCellRenderer());
+		setFont(new Font("Tahoma", Font.PLAIN, 14));
+		setRowHeight(22);
+		setBackground(new Color(84, 77, 71));
+		setForeground(new Color(241, 240, 239));
+		setFillsViewportHeight(true);
+		setSelectionBackground(new Color(48, 44, 40));
+		setSelectionForeground(new Color(241, 240, 239));
+		tableModel.setColumnIdentifiers(columnHeaders);
+		setModel(tableModel);
+		
+		Object[] x = {"0", "0", "19"};
+		Object[] y = {"0", "1", "19"};
+		tableModel.addRow(x); 
+		tableModel.addRow(y); 
+		tableModel.addRow(x); 
+		tableModel.addRow(x); 
+	}
+
+	public DefaultTableModel getTableModel() {
+		return tableModel;
 	}
 
 	@Override
@@ -31,8 +52,17 @@ public class TableOfActiveGames extends JTable {
 	    @Override
 	    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 	        super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column); 
+	        
+	        if (column == 1) {
+		        if (Integer.parseInt((String) table.getModel().getValueAt(row, 1)) == 0) {
+		        	setText("Black");
+		        }
+		        if (Integer.parseInt((String) table.getModel().getValueAt(row, 1)) == 1) {
+		        	setText("White");
+		        }
+	        }
+	        
 	        setBorder(noFocusBorder);
-	        setHorizontalAlignment(CENTER);
 	        return this;
 	    }
 

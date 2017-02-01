@@ -7,7 +7,7 @@ import java.util.Map;
 public class Board {
 	
 	private int size;
-	private StoneColor playerColor, opponentColor;
+//	private StoneColor playerColor, opponentColor;
 
 	private Map<Integer, Stone> stones = new HashMap<Integer, Stone>();
 	private Map<Integer, HashSet<Stone>> groups = new HashMap<Integer, HashSet<Stone>>();
@@ -17,8 +17,8 @@ public class Board {
 	public Board(int size, StoneColor playerColor, StoneColor opponentColor) {
 		
 		this.size = size;
-		this.playerColor = playerColor;
-		this.opponentColor = opponentColor;
+//		this.playerColor = playerColor;
+//		this.opponentColor = opponentColor;
 		
 	}
 	
@@ -55,14 +55,14 @@ private void connectWithNeighbours(int index, StoneColor color) {
 			mergeGroups(neighbourGroup, stones.get(index).getGroup());
 		}
 		if (isOccupied(index - 1) && stones.get(index - 1).getColor() == color) {			//left
-			if (index % size == 0 && (index - 1) % size == 1 || index % size == 1 && (index - 1) % size == 0) {
+			if (index % size == 1 && (index - 1) % size == 0) {
 			} else {
 				int neighbourGroup = stones.get(index - 1).getGroup();
 				mergeGroups(neighbourGroup, stones.get(index).getGroup());
 			}
 		}
 		if (isOccupied(index + 1) && stones.get(index + 1).getColor() == color) {			//right
-			if (index % size == 0 && (index + 1) % size == 1 || index % size == 1 && (index + 1) % size == 0) {
+			if (index % size == 0 && (index + 1) % size == 1) {
 			} else {
 				int neighbourGroup = stones.get(index + 1).getGroup();
 				mergeGroups(neighbourGroup, stones.get(index).getGroup());
@@ -215,11 +215,7 @@ private void connectWithNeighbours(int index, StoneColor color) {
 		
 		if (debug)
 			System.out.print(index + " ");
-			
-			
-//			System.out.print(row + " x " + col + " ");
 		
-		//int index = row + 1 + col * size;
 		
 		if (isOutsideTheBoard(index)) {
 			if (debug)

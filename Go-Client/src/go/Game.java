@@ -68,7 +68,7 @@ public class Game implements Runnable {
 		painter = new Painter();
 		painter.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 		
-		frame = new JFrame(NAME);
+		frame = new JFrame(NAME + " " + playerColor);
 		frame.setContentPane(painter);
 		frame.setSize(WIDTH, HEIGHT);
 		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -129,32 +129,33 @@ public class Game implements Runnable {
 
 		@Override
 		public void mouseMoved(MouseEvent e) {
-			if (e.getX() > space/2 && e.getY() > space/2 && e.getX() < space*size+space/2  && e.getY() < space*size+space/2) {
+			if (e.getX() > space/2 && e.getY() > space/2 && e.getX() < space*size+space/2  && e.getY() < space*size+space/2) {	//is mouse on board area
 				
 				ghostX = (e.getX() - space/2) / space;
 				ghostY = (e.getY() - space/2) / space;
 				
-				if (ghostX < size || ghostY < size) {
-					if (!(ghostX == lastX && ghostY == lastY)) {
-						lastX = ghostX;
-						lastY = ghostY;
-						repaint();
-					}
+				if (ghostX != lastX || ghostY != lastY) {	//is this different game field
+					
+					lastX = ghostX;
+					lastY = ghostY;
+					
+					repaint();
 				}
 			} else {
-				if (ghostX != -100 && ghostY != -100) {
+				if (ghostX != -100 && ghostY != -100) {	//draw ghost stone outside the frame
+					
 					lastX = -1;
 					lastY = -1;
+					
 					ghostX = -100;
 					ghostY = -100;
+					
 					repaint();
 				}
 			}
-			
-			//System.out.println(lastX+1+lastY*size);
 		}
 		
-		public void paintStone(int index, StoneColor color) {
+		public void addStoneAndRepaint(int index, StoneColor color) {
 			gameBoard.addStone(index, color);
 			repaint();
 			Toolkit.getDefaultToolkit().sync();
@@ -169,12 +170,12 @@ public class Game implements Runnable {
 			int y = (e.getY() - space/2) / space;
 			
 			if (x < size && y < size) {
-				if (gameBoard.isMoveLegal(x+1+y*size, playerColor) && isAbleToMove) {
+				if (isAbleToMove && gameBoard.isMoveLegal(x+1+y*size, playerColor)) {
 					isAbleToMove = false;
 					int move = x+1+y*size;
 					System.out.println(move);
 					connection.send("move/" + Integer.toString(move));
-					gameBoard.addStone(move, playerColor);
+					addStoneAndRepaint(move, playerColor);
 				}
 			}
 			
@@ -224,7 +225,7 @@ public class Game implements Runnable {
 					System.out.println(input);
 					String[] array = input.split("/");
 					if(!isAbleToMove && array[0].equals("move")) {
-						painter.paintStone(Integer.parseInt(array[1]), opponentColor);
+						painter.addStoneAndRepaint(Integer.parseInt(array[1]), opponentColor);
 						isAbleToMove = true;
 					}
 				}
