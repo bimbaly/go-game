@@ -33,6 +33,7 @@ public class Connection {
 	}
 	
 	public void close() {
+		send("disconnect");
 		output.close();
 		try {
 			input.close();
@@ -41,6 +42,17 @@ public class Connection {
 			System.out.println("error");
 		}
 		
+	}
+	
+	public void close(String command) {
+		send(command);
+		output.close();
+		try {
+			input.close();
+			socket.close();
+		} catch (IOException e) {
+			System.out.println("error");
+		}
 	}
 	
 	public boolean isConnected() {
