@@ -23,13 +23,13 @@ public class Game implements Runnable {
 	public static final int HEIGHT = WIDTH + 80;	
 	public static final String NAME = "go";
 	
-	private int space;
-	
 	private JFrame frame;
 	private Painter painter;
 	Graphics2D g2d;
 	
 	private int size;
+	private int space;
+	
 	private StoneColor playerColor;
 	private StoneColor opponentColor;
 	private StoneColor ghostColor;
@@ -43,7 +43,6 @@ public class Game implements Runnable {
 	private Connection connection;
 	
 	private boolean isAbleToMove;
-	private String move = null;
 	
 	public Game(int size, int colorIndex, Connection connection) {
 		
@@ -81,8 +80,8 @@ public class Game implements Runnable {
 			            "Are you sure you wish to leave this match?", "Exit?", 
 			            JOptionPane.YES_NO_OPTION,
 			            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-//			            System.exit(0);
-			            frame.dispose();	//close only frame
+			            System.exit(0);
+//			            frame.dispose();	//close only frame
 			        }
 			}
 		});
@@ -103,7 +102,7 @@ public class Game implements Runnable {
 			gameGraphics.drawStone(g2d, stone);
 		}
 		
-		if (gameBoard.isMoveLegal(ghostX+1+ghostY*size, playerColor)) 
+		if (isAbleToMove && gameBoard.isMoveLegal(ghostX+1+ghostY*size, playerColor)) 
 			gameGraphics.drawGhost(g2d, ghostX, ghostY, ghostColor);
 
 	}
@@ -131,8 +130,10 @@ public class Game implements Runnable {
 		@Override
 		public void mouseMoved(MouseEvent e) {
 			if (e.getX() > space/2 && e.getY() > space/2 && e.getX() < space*size+space/2  && e.getY() < space*size+space/2) {
+				
 				ghostX = (e.getX() - space/2) / space;
 				ghostY = (e.getY() - space/2) / space;
+				
 				if (ghostX < size || ghostY < size) {
 					if (!(ghostX == lastX && ghostY == lastY)) {
 						lastX = ghostX;
@@ -149,12 +150,12 @@ public class Game implements Runnable {
 					repaint();
 				}
 			}
+			
 			//System.out.println(lastX+1+lastY*size);
 		}
 		
 		public void paintStone(int index, StoneColor color) {
-			if(gameBoard.isMoveLegal(index, color))
-					gameBoard.addStone(index, color);
+			gameBoard.addStone(index, color);
 			repaint();
 			Toolkit.getDefaultToolkit().sync();
 		}

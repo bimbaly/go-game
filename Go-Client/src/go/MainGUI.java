@@ -7,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -17,9 +18,6 @@ import javax.swing.JScrollPane;
 
 
 public class MainGUI implements ActionListener {
-	
-	private static final int SIZE = 9;
-	private static final int COLOR = 0;
 	
 	private JFrame frame;
 	private JButton createBtn, joinBtn, refreshBtn;
@@ -78,15 +76,27 @@ public class MainGUI implements ActionListener {
 	}
 	
 	private void establishConnection() {
-		do {
-			ConnectDialog connectionSettings = new ConnectDialog();
-			try {
-				connection = new Connection(connectionSettings.getIp(), connectionSettings.getPort());
-				System.out.println("connected");
-			} catch (IOException e) {
-				JOptionPane.showMessageDialog(null, "Unable to connect", "Connection error", JOptionPane.ERROR_MESSAGE);
-			}
-		} while (connection == null);
+//		do {
+//			ConnectDialog connectionSettings = new ConnectDialog();
+//			try {
+//				connection = new Connection(connectionSettings.getIp(), connectionSettings.getPort());
+//				System.out.println("connected");
+//			} catch (IOException e) {
+//				JOptionPane.showMessageDialog(null, "Unable to connect", "Connection error", JOptionPane.ERROR_MESSAGE);
+//			}
+//		} while (connection == null);
+		
+		try {																//REVERSE
+			connection = new Connection("127.0.0.1", 2222);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.out.println("Connection refused");
+		}
+		if (connection == null) {
+			System.exit(0);
+		}
+		
 		refresh();
 	}
 	
@@ -109,13 +119,18 @@ public class MainGUI implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == createBtn) {
-			NewGameDialog newGameSettings = new NewGameDialog();
-			connection.send("create/" + newGameSettings.getSize() + "/" + newGameSettings.getColorIndex());
-			gameThread = new Thread(new Game(newGameSettings.getSize(), newGameSettings.getColorIndex(), connection));
+//			NewGameDialog newGameSettings = new NewGameDialog();
+//			connection.send("create/" + newGameSettings.getSize() + "/" + newGameSettings.getColorIndex());
+//			gameThread = new Thread(new Game(newGameSettings.getSize(), newGameSettings.getColorIndex(), connection));
+			
+			connection.send("create/13/0");																//REVERSE
+			gameThread = new Thread(new Game(13, 0, connection));
+			
 			gameThread.start();
 		} else if (e.getSource() == joinBtn) {
 			connection.send("join/" + 0); // zawsze dolacza do 
-			gameThread = new Thread(new Game(SIZE, 1, connection));
+//			gameThread = new Thread(new Game(SIZE, 1, connection));
+			gameThread = new Thread(new Game(13, 1, connection));																//REVERSE
 			gameThread.start();
 		} else if (e.getSource() == refreshBtn) {
 			refresh();

@@ -72,6 +72,7 @@ public class GameGraphics {
 		//last move highlight
 		if (stone.getIndex() == Stone.getLastMoveIndex()) {
 			g2d.setColor(LAST_MOVE_HIGHLIGHT);
+			g2d.setStroke(new BasicStroke(1.5f));
 			g2d.drawOval(xx, yy, space, space);
 //			g2d.fillOval(xx+space/4*2, yy+space/4*2, space/4, space/4);
 		}
