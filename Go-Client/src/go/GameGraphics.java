@@ -10,7 +10,7 @@ public class GameGraphics {
 	public static final Color BLACK_STROKE = Color.white;
 	public static final Color BLACK_GHOST = new Color(0, 0, 0, 200);
 	
-	public static final Color WHITE_BG = new Color(230, 230, 230);
+	public static final Color WHITE_BG = new Color(235, 235, 235);
 	public static final Color WHITE_STROKE = Color.white;
 	public static final Color WHITE_GHOST = new Color(235, 235, 235, 200);
 	

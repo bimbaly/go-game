@@ -84,15 +84,15 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 	}
 	
 	private void establishConnection() {
-//		do {
-//			ConnectDialog connectionSettings = new ConnectDialog();
-//			try {
-//				connection = new Connection(connectionSettings.getIp(), connectionSettings.getPort());
-//				System.out.println("connected");
-//			} catch (IOException e) {
-//				JOptionPane.showMessageDialog(null, "Unable to connect", "Connection error", JOptionPane.ERROR_MESSAGE);
-//			}
-//		} while (connection == null);
+		do {
+			ConnectDialog connectionSettings = new ConnectDialog();
+			try {
+				connection = new Connection(connectionSettings.getIp(), connectionSettings.getPort());
+				System.out.println("connected");
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(null, "Unable to connect", "Connection error", JOptionPane.ERROR_MESSAGE);
+			}
+		} while (connection == null);
 		
 //		try {																//REVERSE
 //			connection = new Connection("127.0.0.1", 2222);
@@ -105,7 +105,7 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 //			System.exit(0);
 //		}
 		
-//		refresh();
+		refresh();
 	}
 	
 	//method to get active games to print it in table
@@ -113,11 +113,14 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 		connection.send("refresh");
 		String input;
 		try {
-			while(!((input = connection.readInput()).equals("done"))) {
-				// input contains String representation of game, eg. game/ID_OF_PLAYER/SIZE/COLOR   <--------- STRING 
+			while(!((input = connection.readInput()).equals("done"))) {		// input contains String representation of game, eg. game/ID_OF_PLAYER/SIZE/COLOR   <--------- STRING 
 				
-//				Object[] row = {"1", "19", "Black"};
-//				table.getTableModel().addRow(row);
+				String[] array = input.split("/");
+				if(array[0].equals("game")) {
+					Object[] row = {array[1], array[3], array[2]};
+					table.getTableModel().addRow(row);
+				}
+
 				
 				System.out.println(input);
 			}
@@ -131,23 +134,17 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == createBtn) {
-//			NewGameDialog newGameSettings = new NewGameDialog();
-//			connection.send("create/" + newGameSettings.getSize() + "/" + newGameSettings.getColorIndex());
-//			gameThread = new Thread(new Game(newGameSettings.getSize(), newGameSettings.getColorIndex(), connection));
-			
-			connection.send("create/13/0");																//REVERSE
-			gameThread = new Thread(new Game(13, 0, connection));
-			
+			NewGameDialog newGameSettings = new NewGameDialog();
+			connection.send("create/" + newGameSettings.getSize() + "/" + newGameSettings.getColorIndex());
+			gameThread = new Thread(new Game(newGameSettings.getSize(), newGameSettings.getColorIndex(), connection));
 			gameThread.start();
 		} else if (e.getSource() == joinBtn) {
 			connection.send("join/" + 0); // zawsze dolacza do 
-//			gameThread = new Thread(new Game(SIZE, 1, connection));
-//			gameThread = new Thread(new Game(13, 1, connection));																//REVERSE
-			gameThread = new Thread(new Game(joinSize, joinColorIndex, connection));																//REVERSE
+			gameThread = new Thread(new Game(joinSize, joinColorIndex, connection));
 			gameThread.start();
 		} else if (e.getSource() == refreshBtn) {
-//			refresh();
-			table.getTableModel().removeRow(0);
+//			table.getTableModel().removeRow(0);
+			refresh();
 			System.out.println("refresh");
 		}
 	}
@@ -158,13 +155,23 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 		System.out.println("row = " + table.getSelectedRow());
 		
 		if (table.getSelectedRow() == -1) {
+			
 			System.out.println("no row is selected");
 			joinBtn.setEnabled(false);
+			
 		} else {
-			joinColorIndex = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 1).toString());
+			
+			int selectedColorIndex = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 1).toString());
+			if (selectedColorIndex == 0) {
+				joinColorIndex = 1;
+			} else if (selectedColorIndex == 1) {
+				joinColorIndex = 0;
+			}
 			joinSize = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 2).toString());
+			
 			System.out.println("color = " + joinColorIndex);
 			System.out.println("size = " + joinSize);
+			
 			joinBtn.setEnabled(true);
 		}
 		

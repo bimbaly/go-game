@@ -42,7 +42,7 @@ public class Game implements Runnable {
 	
 	private Connection connection;
 	
-	private boolean isAbleToMove;
+	private boolean isAbleToMove = false;
 	
 	public Game(int size, int colorIndex, Connection connection) {
 		
@@ -54,12 +54,12 @@ public class Game implements Runnable {
 			playerColor = StoneColor.BLACK;
 			ghostColor = StoneColor.BLACK_GHOST;
 			opponentColor = StoneColor.WHITE;
-			isAbleToMove = true;
+//			isAbleToMove = true;
 		} else if (colorIndex == 1) {
 			playerColor = StoneColor.WHITE;
 			ghostColor = StoneColor.WHITE_GHOST;
 			opponentColor = StoneColor.BLACK;
-			isAbleToMove = false;
+//			isAbleToMove = false;
 		}
 		
 		gameGraphics = new GameGraphics(size, space);
@@ -207,6 +207,9 @@ public class Game implements Runnable {
 			while((input = connection.readInput()) != null) {
 				if(input.equals("allow") || input.equals("found"))
 					System.out.println(input);
+				if (playerColor == StoneColor.BLACK) {
+					isAbleToMove = true;
+				}
 					isAllowed = true;
 					break;
 			}

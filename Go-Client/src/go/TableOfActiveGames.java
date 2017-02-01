@@ -30,12 +30,12 @@ public class TableOfActiveGames extends JTable {
 		tableModel.setColumnIdentifiers(columnHeaders);
 		setModel(tableModel);
 		
-		Object[] x = {"0", "0", "19"};
-		Object[] y = {"0", "1", "19"};
-		tableModel.addRow(x); 
-		tableModel.addRow(y); 
-		tableModel.addRow(x); 
-		tableModel.addRow(x); 
+//		Object[] x = {"0", "0", "19"};
+//		Object[] y = {"0", "1", "19"};
+//		tableModel.addRow(x); 
+//		tableModel.addRow(y); 
+//		tableModel.addRow(x); 
+//		tableModel.addRow(x); 
 	}
 
 	public DefaultTableModel getTableModel() {

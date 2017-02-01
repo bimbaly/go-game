@@ -12,7 +12,7 @@ public class Board {
 	private Map<Integer, Stone> stones = new HashMap<Integer, Stone>();
 	private Map<Integer, HashSet<Stone>> groups = new HashMap<Integer, HashSet<Stone>>();
 	
-	private boolean debug = true;
+	private boolean debug = false;
 	
 	public Board(int size, StoneColor playerColor, StoneColor opponentColor) {
 		
