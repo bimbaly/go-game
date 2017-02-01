@@ -111,6 +111,7 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 	//method to get active games to print it in table
 	private void refresh() {
 		connection.send("refresh");
+		table.getTableModel().setRowCount(0);
 		String input;
 		try {
 			while(!((input = connection.readInput()).equals("done"))) {		// input contains String representation of game, eg. game/ID_OF_PLAYER/SIZE/COLOR   <--------- STRING 
@@ -119,8 +120,8 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 				if(array[0].equals("game")) {
 					Object[] row = {array[1], array[3], array[2]};
 					table.getTableModel().addRow(row);
+					System.out.println("adding row " + row);
 				}
-
 				
 				System.out.println(input);
 			}
@@ -135,6 +136,9 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == createBtn) {
 			NewGameDialog newGameSettings = new NewGameDialog();
+			if (newGameSettings.isCancelled()) {
+				return;
+			}
 			connection.send("create/" + newGameSettings.getSize() + "/" + newGameSettings.getColorIndex());
 			gameThread = new Thread(new Game(newGameSettings.getSize(), newGameSettings.getColorIndex(), connection));
 			gameThread.start();

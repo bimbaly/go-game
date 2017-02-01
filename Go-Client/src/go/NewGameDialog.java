@@ -10,6 +10,7 @@ public class NewGameDialog {
 	private int[] boardSizeValue = {9, 13, 19};
 	
 	private int mode, size, colorIndex;
+	private boolean isCancelled;
 	
 	public NewGameDialog() {
 		
@@ -37,11 +38,16 @@ public class NewGameDialog {
 //			System.out.println("Play as: " + playAs.getSelectedIndex());
 
 		} else {
+			isCancelled = true;
 //		    System.out.println("New game canceled");
 		}
 		
 	}
 
+	public boolean isCancelled() {
+		return isCancelled;
+	}
+	
 	public int getMode() {
 		return mode;
 	}

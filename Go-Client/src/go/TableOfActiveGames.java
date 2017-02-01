@@ -13,7 +13,7 @@ public class TableOfActiveGames extends JTable {
 	private DefaultTableCellRenderer customRenderer = new DefaultTableCellRenderer();
 	private DefaultTableModel tableModel = new DefaultTableModel();
 	
-	private static String[] columnHeaders = {"ID", "Size", "Color"};
+	private static String[] columnHeaders = {"ID", "Color", "Size"};
 	
 	public TableOfActiveGames() {
 //		super();
