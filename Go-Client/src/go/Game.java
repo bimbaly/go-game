@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 
 public class Game implements Runnable {
 
-	public static final int SCALE = 4;
+	public static final int SCALE = 2;
 	public static final int WIDTH = 140 * SCALE;	//width should be multiple of 140 for 9x9, 13x13 and 19x19 board sizes
 	public static final int HEIGHT = WIDTH + 80;	
 	public static final String NAME = "go";
@@ -43,6 +43,7 @@ public class Game implements Runnable {
 	private Connection connection;
 	
 	private boolean isAbleToMove = false;
+	private boolean left = false;
 	
 	public Game(int size, int colorIndex, Connection connection) {
 		
@@ -54,12 +55,10 @@ public class Game implements Runnable {
 			playerColor = StoneColor.BLACK;
 			ghostColor = StoneColor.BLACK_GHOST;
 			opponentColor = StoneColor.WHITE;
-//			isAbleToMove = true;
 		} else if (colorIndex == 1) {
 			playerColor = StoneColor.WHITE;
 			ghostColor = StoneColor.WHITE_GHOST;
 			opponentColor = StoneColor.BLACK;
-//			isAbleToMove = false;
 		}
 		
 		gameGraphics = new GameGraphics(size, space);
@@ -80,9 +79,12 @@ public class Game implements Runnable {
 			            "Are you sure you wish to leave this match?", "Exit?", 
 			            JOptionPane.YES_NO_OPTION,
 			            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-			            System.exit(0);
-//			            frame.dispose();	//close only frame
-			        }
+							isAbleToMove = false;
+							left = true;
+							connection.send("leave");
+			            	//System.exit(0);
+			            	frame.dispose();	//close only frame
+						}
 			}
 		});
 		frame.setResizable(false);
@@ -201,41 +203,49 @@ public class Game implements Runnable {
 
 	}
 	
-	private boolean isAllowToStart() {
-		String input;boolean isAllowed = false;
-		try {
-			while((input = connection.readInput()) != null) {
-				if(input.equals("allow") || input.equals("found"))
-					System.out.println(input);
-				if (playerColor == StoneColor.BLACK) {
-					isAbleToMove = true;
-				}
-					isAllowed = true;
-					break;
-			}
-		} catch (IOException e) {
-			
-		}
-		return isAllowed;
-	}
-	
 	@Override
 	public void run() {
-		if(isAllowToStart()) {
 			String input;
 			try {
-				while((input = connection.readInput()) != null) {
-					System.out.println(input);
+				main: while((input = connection.readInput()) != null && !left) {
+					//System.out.println(input);
 					String[] array = input.split("/");
-					if(!isAbleToMove && array[0].equals("move")) {
-						painter.addStoneAndRepaint(Integer.parseInt(array[1]), opponentColor);
-						isAbleToMove = true;
+					switch (array[0]) {
+					
+					case "left":
+						isAbleToMove = false;
+						JOptionPane.showMessageDialog(null, "Your enemy has left!", "Game ended", JOptionPane.INFORMATION_MESSAGE);
+						System.out.println("enemy has left...");
+						frame.dispose();
+						break main;
+						
+					case "found":
+						if(playerColor == StoneColor.BLACK)
+							isAbleToMove = true;
+						break;
+						
+					case "move":
+						if(!isAbleToMove)
+							painter.addStoneAndRepaint(Integer.parseInt(array[1]), opponentColor);
+							isAbleToMove = true;
+							break;
+							
+					case "winner":
+						isAbleToMove = false;
+						JOptionPane.showMessageDialog(null, "Game ended", "You are winner!", JOptionPane.INFORMATION_MESSAGE);
+						System.out.println("You are winner");
+						frame.dispose();
+						break main;
+					
+					case "pass": break;
+					case "count": break;
+					
+					default: break;
 					}
 				}
 			} catch (IOException e) {
-				
+				frame.dispose();
 			}
-		}	
 	}
 	
 }

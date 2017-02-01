@@ -19,14 +19,9 @@ public class Phase {
 		String[] inputArray = input.split("/");
 		
 		switch (inputArray[0]) {
-		
-		case "connect":
-			//send active games to just connected player
-			loadGames();
-			break;
-		
-		case "disconnect":	
-			//close connection, remove player and end his thread
+			
+		case "disconnect":
+			player.setConnected(false);
 			break;
 			
 		case "refresh":
@@ -35,10 +30,9 @@ public class Phase {
 			break;
 			
 		case "create":
-			//create "game" entry in games HashMap, set "busy" to true and refresh games to other players
+			//create "game" entry in games HashMap, set "busy" to true
 			handler.addGame(inputArray[1] + "/" + inputArray[2], id);
 			handler.setBusy(id, true);
-			handler.sendToAll("game/" + id + "/" + handler.getGames().get(id), id);
 			break;
 			
 		case "join":
@@ -46,7 +40,6 @@ public class Phase {
 			int enemyId = Integer.parseInt(inputArray[1]);
 			if(handler.isBusy(enemyId)) {
 				handler.setBusy(enemyId, false);
-				//handler.sendToAllExcept("remove_game/" + enemyId + "/" + handler.getGames().get(enemyId), id, enemyId);
 				handler.setEnemyId(id, enemyId);
 				handler.setEnemyId(enemyId, id);
 				handler.setPlaying(id, true);
@@ -64,12 +57,35 @@ public class Phase {
 			//bot phase
 			break;
 			
+		case "leave":
+			if(handler.isBusy(id)) {
+				handler.setBusy(id, false);
+			}
+			if(handler.isPlaying(id)) {
+				handler.send("left", handler.getEnemyId(id));
+				if(handler.getGames().containsKey(id)) {
+					System.out.println("removing game " + id);
+					handler.removeGame(id);
+				} else { 
+					handler.removeGame(handler.getEnemyId(id));
+				}
+				handler.setPlaying(id, false);
+				handler.setPlaying(handler.getEnemyId(id), false);
+			} else {
+				System.out.println("(2)removing game " + id);
+				handler.removeGame(id);
+			}
+			for (Integer key : handler.getGames().keySet()) {
+					System.out.println("sending: game/" + key + "/" + handler.getGames().get(key));
+			}
+			break;
+			
 		case "move":
 			handler.send("move/" + inputArray[1], handler.getEnemyId(id));
 			break;
 			
 		case "surrender": 
-			handler.send("surrender", handler.getEnemyId(id));
+			handler.send("winner", handler.getEnemyId(id));
 			break;
 			
 		case "pass": 
@@ -87,11 +103,12 @@ public class Phase {
 	private void loadGames() throws IOException {
 		if(!handler.getGames().isEmpty()) {
 			for (Integer key : handler.getGames().keySet()) {
-				if (key != id)
+				if (key != id) 
 					handler.send("game/" + key + "/" + handler.getGames().get(key), id);
+					System.out.println("sending: game/" + key + "/" + handler.getGames().get(key));
 			}
 		} else {
-			handler.send("no games found", id);
+			handler.send("no games", id);
 		}
 	}
 }
