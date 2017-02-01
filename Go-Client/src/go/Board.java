@@ -211,12 +211,12 @@ private void connectWithNeighbours(int index) {
 		return false;
 	}
 	
-	public boolean isMoveLegal(int row, int col, StoneColor color) {
+	public boolean isMoveLegal(int index, StoneColor color) {
 		
-		if (debug)
-			System.out.print(row + " x " + col + " ");
+//		if (debug)
+//			System.out.print(row + " x " + col + " ");
 		
-		int index = row + 1 + col * size;
+		//int index = row + 1 + col * size;
 		
 		if (isOutsideTheBoard(index)) {
 			if (debug)

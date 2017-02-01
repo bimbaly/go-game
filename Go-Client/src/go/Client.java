@@ -31,7 +31,7 @@ public class Client implements ActionListener {
 				//dialog for invalid data
 				JOptionPane.showMessageDialog(null, "Unable to connect", "Connection error", JOptionPane.ERROR_MESSAGE);
 			}
-		} while (connection != null);
+		} while (connection == null);
 	}
 	
 	private void refresh() {
@@ -53,7 +53,7 @@ public class Client implements ActionListener {
 		if (e.getSource() == createBtn) {
 			NewGameDialog newGameSettings = new NewGameDialog();
 			System.out.println("create " + newGameSettings.getSize() + " " + newGameSettings.getColorIndex());
-			new Game(newGameSettings.getSize(), newGameSettings.getColorIndex());
+			//new Game(newGameSettings.getSize(), newGameSettings.getColorIndex());
 		} else if (e.getSource() == joinBtn) {
 			System.out.println("join");
 		} else if (e.getSource() == refreshBtn) {

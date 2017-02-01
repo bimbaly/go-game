@@ -29,7 +29,18 @@ public class Connection {
 	}
 	
 	public void send(String msg) {
-		output.write(msg);
+		output.println(msg);
+	}
+	
+	public void close() {
+		output.close();
+		try {
+			input.close();
+			socket.close();
+		} catch (IOException e) {
+			System.out.println("error");
+		}
+		
 	}
 	
 	public boolean isConnected() {

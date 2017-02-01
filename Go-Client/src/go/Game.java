@@ -9,13 +9,14 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
-public class Game {
+public class Game implements Runnable {
 
 	public static final int SCALE = 4;
 	public static final int WIDTH = 140 * SCALE;	//width should be multiple of 140 for 9x9, 13x13 and 19x19 board sizes
@@ -39,19 +40,27 @@ public class Game {
 	private GameGraphics gameGraphics;
 	private Board gameBoard;
 	
-	public Game(int size, int colorIndex) {
+	private Connection connection;
+	
+	private boolean isAbleToMove;
+	private String move = null;
+	
+	public Game(int size, int colorIndex, Connection connection) {
 		
 		this.size = size;
 		this.space = WIDTH/(size+1);
-		
+		this.connection = connection;
+
 		if (colorIndex == 0) {
 			playerColor = StoneColor.BLACK;
 			ghostColor = StoneColor.BLACK_GHOST;
 			opponentColor = StoneColor.WHITE;
+			isAbleToMove = true;
 		} else if (colorIndex == 1) {
 			playerColor = StoneColor.WHITE;
 			ghostColor = StoneColor.WHITE_GHOST;
 			opponentColor = StoneColor.BLACK;
+			isAbleToMove = false;
 		}
 		
 		gameGraphics = new GameGraphics(size, space);
@@ -94,7 +103,7 @@ public class Game {
 			gameGraphics.drawStone(g2d, stone);
 		}
 		
-		if (gameBoard.isMoveLegal(ghostX, ghostY, playerColor)) 
+		if (gameBoard.isMoveLegal(ghostX+1+ghostY*size, playerColor)) 
 			gameGraphics.drawGhost(g2d, ghostX, ghostY, ghostColor);
 
 	}
@@ -140,11 +149,18 @@ public class Game {
 					repaint();
 				}
 			}
+			//System.out.println(lastX+1+lastY*size);
 		}
-
+		
+		public void paintStone(int index, StoneColor color) {
+			if(gameBoard.isMoveLegal(index, color))
+					gameBoard.addStone(index, color);
+			repaint();
+			Toolkit.getDefaultToolkit().sync();
+		}
+		
 		@Override
 		public void mousePressed(MouseEvent e) {
-			
 			if (!(e.getX() > space/2 && e.getY() > space/2 && e.getX() < space*size+space/2  && e.getY() < space*size+space/2)) {
 				return;
 			}
@@ -152,8 +168,12 @@ public class Game {
 			int y = (e.getY() - space/2) / space;
 			
 			if (x < size && y < size) {
-				if (gameBoard.isMoveLegal(x, y, playerColor)) {
-					gameBoard.addStone(x+1+y*size, playerColor);
+				if (gameBoard.isMoveLegal(x+1+y*size, playerColor) && isAbleToMove) {
+					isAbleToMove = false;
+					int move = x+1+y*size;
+					System.out.println(move);
+					connection.send("move/" + Integer.toString(move));
+					gameBoard.addStone(move, playerColor);
 				}
 			}
 			
@@ -178,7 +198,39 @@ public class Game {
 		}
 
 	}
-
+	
+	private boolean isAllowToStart() {
+		String input;boolean isAllowed = false;
+		try {
+			while((input = connection.readInput()) != null) {
+				if(input.equals("allow") || input.equals("found"))
+					System.out.println(input);
+					isAllowed = true;
+					break;
+			}
+		} catch (IOException e) {
+			
+		}
+		return isAllowed;
+	}
+	
+	@Override
+	public void run() {
+		if(isAllowToStart()) {
+			String input;
+			try {
+				while((input = connection.readInput()) != null) {
+					System.out.println(input);
+					String[] array = input.split("/");
+					if(!isAbleToMove && array[0].equals("move")) {
+						painter.paintStone(Integer.parseInt(array[1]), opponentColor);
+						isAbleToMove = true;
+					}
+				}
+			} catch (IOException e) {
+				
+			}
+		}	
+	}
+	
 }
-
-

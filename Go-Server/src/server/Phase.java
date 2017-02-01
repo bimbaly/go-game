@@ -46,7 +46,7 @@ public class Phase {
 			int enemyId = Integer.parseInt(inputArray[1]);
 			if(handler.isBusy(enemyId)) {
 				handler.setBusy(enemyId, false);
-				handler.sendToAllExcept("remove_game/" + enemyId + "/" + handler.getGames().get(enemyId), id, enemyId);
+				//handler.sendToAllExcept("remove_game/" + enemyId + "/" + handler.getGames().get(enemyId), id, enemyId);
 				handler.setEnemyId(id, enemyId);
 				handler.setEnemyId(enemyId, id);
 				handler.setPlaying(id, true);
@@ -56,7 +56,7 @@ public class Phase {
 				handler.send("allow", id);
 			} else {
 				handler.send("busy", id);
-				loadGames();
+				//loadGames();
 			}			
 			break;
 			
@@ -65,7 +65,7 @@ public class Phase {
 			break;
 			
 		case "move":
-			handler.send(inputArray[1], handler.getEnemyId(id));
+			handler.send("move/" + inputArray[1], handler.getEnemyId(id));
 			break;
 			
 		case "surrender": 
