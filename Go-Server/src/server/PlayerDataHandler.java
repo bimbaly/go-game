@@ -59,6 +59,10 @@ public class PlayerDataHandler {
 		return games;
 	}
 	
+	public boolean isGameNull(int gameId) {
+		return games.get(gameId).isEmpty();
+	}
+	
 	public synchronized void addGame(String game, int gameId) {
 		games.put(gameId, game);
 	}

@@ -26,14 +26,16 @@ public class PlayerThread implements Runnable {
 		String input;
 		try {
 			while(player.isConnected() && (input = getInput()) != null) {
+				view.setLog(input);
 				phase.process(input);
 			}
 		} catch (IOException e) {
 			close();
 		} finally {
-			close();
+			if(!player.isConnected())
+				close();
+			view.setLog("thread " + player.getId() + " disconnected");
 		}
-		view.setLog("thread " + player.getId() + " disconnected");
 	}
 	
 	private String getInput() throws IOException {
@@ -44,14 +46,14 @@ public class PlayerThread implements Runnable {
 		try {
 			socket.close();
 		} catch (IOException e) {
-			
+			view.setLog("unable to close socket");
 		} finally {
 			if (handler.isPlaying(player.getId()))
 				try {
-					handler.send("disconnected", handler.getEnemyId(player.getId()));
-				} catch (IOException e1) {
-
-				}
+					handler.send("left", handler.getEnemyId(player.getId()));
+				} catch (IOException e) {
+					view.setLog("unable to send leave command");
+				}	
 		}
 	}
 }
