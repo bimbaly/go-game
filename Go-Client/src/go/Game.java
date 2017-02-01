@@ -24,7 +24,7 @@ import javax.swing.JScrollPane;
 
 public class Game implements Runnable {
 
-	public static final int SCALE = 2;
+	public static final int SCALE = 4;
 	public static final int WIDTH = 140 * SCALE;	//width should be multiple of 140 for 9x9, 13x13 and 19x19 board sizes
 	public static final int HEIGHT = WIDTH + 50;	
 	public static final String NAME = "go";
@@ -51,7 +51,6 @@ public class Game implements Runnable {
 	JButton surrenderBtn, passBtn;
 	
 	private boolean isAbleToMove = false;
-	private boolean left = false;
 	
 	public Game(int size, int colorIndex, Connection connection) {
 		
@@ -237,13 +236,37 @@ public class Game implements Runnable {
 
 	}
 	
+<<<<<<< HEAD
+=======
+	private boolean isAllowToStart() {
+		String input;boolean isAllowed = false;
+		try {
+			while((input = connection.readInput()) != null) {
+				if(input.equals("allow") || input.equals("found"))
+					System.out.println(input);
+				if (playerColor == StoneColor.BLACK) {
+					isAbleToMove = true;
+					passBtn.setEnabled(true);
+				}
+					isAllowed = true;
+					break;
+			}
+		} catch (IOException e) {
+			
+		}
+		return isAllowed;
+	}
+	
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 	@Override
 	public void run() {
+		if(isAllowToStart()) {
 			String input;
 			try {
-				main: while((input = connection.readInput()) != null && !left) {
-					//System.out.println(input);
+				while((input = connection.readInput()) != null) {
+					System.out.println(input);
 					String[] array = input.split("/");
+<<<<<<< HEAD
 					switch (array[0]) {
 					
 					case "left":
@@ -278,11 +301,18 @@ public class Game implements Runnable {
 					case "count": break;
 					
 					default: break;
+=======
+					if(!isAbleToMove && array[0].equals("move")) {
+						painter.addStoneAndRepaint(Integer.parseInt(array[1]), opponentColor);
+						isAbleToMove = true;
+						passBtn.setEnabled(true);
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 					}
 				}
 			} catch (IOException e) {
-				frame.dispose();
+				
 			}
+		}	
 	}
 	
 }

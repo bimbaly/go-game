@@ -6,9 +6,8 @@ import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,8 +20,6 @@ import javax.swing.event.ListSelectionListener;
 
 
 public class MainGUI implements ActionListener, ListSelectionListener {
-	
-	private boolean debug = true;
 	
 	private JFrame frame;
 	private JButton createBtn, joinBtn, refreshBtn;
@@ -84,6 +81,7 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 		buttonsPanel.add(joinBtn);
 		frame.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 		frame.getContentPane().add(infoLbl = new JLabel(), BorderLayout.NORTH);
+<<<<<<< HEAD
 		frame.addWindowListener(new WindowAdapter() {
 
 			@Override
@@ -97,51 +95,47 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 						}
 			}
 		});
+=======
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 //		frame.pack();
 	}
 	
 	private void establishConnection() {
-		
-		if(debug)
-			System.out.println("connecting to server...");
-		
 		do {
 			ConnectDialog connectionSettings = new ConnectDialog();
 			try {
 				connection = new Connection(connectionSettings.getIp(), connectionSettings.getPort());
-				
-				if(debug)
-					System.out.println("success!");
-				
-				refresh();
+				System.out.println("connected");
 			} catch (IOException e) {
-				
-				if(debug)
-					System.out.println("fail, retrying");
-				
 				JOptionPane.showMessageDialog(null, "Unable to connect", "Connection error", JOptionPane.ERROR_MESSAGE);
 			}
 		} while (connection == null);
+<<<<<<< HEAD
+=======
+		
+		refresh();
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 	}
 	
 	//method to get active games to print it in table
 	private void refresh() {
-		
-		if(debug)
-			System.out.println("updating games list...");
-		
-		table.getTableModel().setRowCount(0);
 		connection.send("refresh");
+		table.getTableModel().setRowCount(0);
 		String input;
 		try {
-			while(!(input = connection.readInput()).equals("done")) {		// input contains String representation of game, eg. game/ID_OF_PLAYER/SIZE/COLOR   <--------- STRING 
-				//System.out.println(input);
+			while(!((input = connection.readInput()).equals("done"))) {		// input contains String representation of game, eg. game/ID_OF_PLAYER/SIZE/COLOR   <--------- STRING 
+				
 				String[] array = input.split("/");
 				if(array[0].equals("game")) {
 					Object[] row = {array[1], array[3], array[2]};
 					table.getTableModel().addRow(row);
+<<<<<<< HEAD
 //					System.out.println("row added " + array[1] + " " + array[3] + " " + array[2]);
+=======
+					System.out.println("adding row " + array[1] + " " + array[3] + " " + array[2]);
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 				}
+<<<<<<< HEAD
 			}
 			infoLbl.setText(Integer.toString(table.getTableModel().getRowCount()) + " games available");
 			
@@ -197,9 +191,14 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 					System.out.println("success!");
 				gameThread = new Thread(new Game(joinSize, joinColorIndex, connection));
 				gameThread.start();
+=======
+				
+				System.out.println(input);
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 			}
 		} catch (IOException e) {
 			connection.close();
+			connection = null;
 			establishConnection();
 		}
 	}
@@ -207,22 +206,43 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == createBtn) {
-			create();
+			NewGameDialog newGameSettings = new NewGameDialog();
+			if (newGameSettings.isCancelled()) {
+				return;
+			}
+			connection.send("create/" + newGameSettings.getSize() + "/" + newGameSettings.getColorIndex());
+			gameThread = new Thread(new Game(newGameSettings.getSize(), newGameSettings.getColorIndex(), connection));
+			gameThread.start();
 		} else if (e.getSource() == joinBtn) {
+<<<<<<< HEAD
 			join();
+=======
+			connection.send("join/" + joinPlayerID);
+			gameThread = new Thread(new Game(joinSize, joinColorIndex, connection));
+			gameThread.start();
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 		} else if (e.getSource() == refreshBtn) {
 			refresh();
+			System.out.println("refresh");
 		}
 	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		
+<<<<<<< HEAD
 //		System.out.println("row = " + table.getSelectedRow());
+=======
+		System.out.println("row = " + table.getSelectedRow());
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 		
 		if (table.getSelectedRow() == -1) {
 			
+<<<<<<< HEAD
 //			System.out.println("no row is selected");
+=======
+			System.out.println("no row is selected");
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 			joinBtn.setEnabled(false);
 			
 		} else {
@@ -236,9 +256,15 @@ public class MainGUI implements ActionListener, ListSelectionListener {
 			joinSize = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 2).toString());
 			joinPlayerID = Integer.parseInt(table.getValueAt(table.getSelectedRow(), 0).toString());
 			
+<<<<<<< HEAD
 //			System.out.println("color = " + joinColorIndex);
 //			System.out.println("size = " + joinSize);
 //			System.out.println("id = " + joinPlayerID);
+=======
+			System.out.println("color = " + joinColorIndex);
+			System.out.println("size = " + joinSize);
+			System.out.println("id = " + joinPlayerID);
+>>>>>>> branch 'master' of https://github.com/bimbaly/go-game.git
 			
 			joinBtn.setEnabled(true);
 		}
